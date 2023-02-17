@@ -1,0 +1,68 @@
+/* VARS */
+:root{
+    --white-color: #fdfdfd;
+    --black-color: #0d0d0d;
+}
+/* CLEAR */
+body, header, h1, h2{
+    margin: 0;
+}
+body{
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+/* STYLING */
+.header{
+    background-color: var(--black-color);
+    padding: 20px 80px 20px 80px;
+    color: var(--white-color);
+}
+.header h1{
+    font-size: 2rem;
+    font-weight: bold;
+}
+.header-content{
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: space-between;
+}
+.header-options{
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 20px;
+    justify-content: end;
+}
+.header-creator{
+    font-weight: 500;
+    align-self: center;
+    font-size: 1rem;
+}
+.header-creator a{
+    color: var(--white-color);
+    text-decoration: none;
+}
+.header-creator a:hover{
+    text-decoration: underline;
+}
+.header-btn{
+    background: transparent;
+    color: var(--white-color);
+    font-size: 1.2rem;
+    align-self: center;
+    border: none;
+}
+.header-btn:hover{
+    cursor: pointer;
+    text-decoration: underline;
+}
+.header-btn.connecting:hover{
+    cursor: default;
+}
+.chess-game{
+    height: 100%;
+    background-color: tomato;
+}
+#chess-canvas{
+    background-color: aqua;
+}
