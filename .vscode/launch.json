@@ -5,8 +5,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "guess-api",
-            "cwd": "guess-api",
+            "name": "guess_api",
+            "cwd": "guess_api",
             "request": "launch",
             "type": "dart",
             "program": "bin/guess_api.dart"

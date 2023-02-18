@@ -6,22 +6,14 @@ class ChessApi{
         "destroyChessPiece": []
     }
 
-    constructor(address){
+    constructor(address, onOpen = (_event) => {}, onClose = (_event) => {}){
         this.#socket = new WebSocket(address)
-        this.#socket.onopen(this.#onOpen)
-        this.#socket.onmessage(this.#onMessage)
-        this.#socket.onclose(this.#onClose)
+        this.#socket.onopen = onOpen
+        this.#socket.onclose = onClose
+        this.#socket.onmessage = this.#onMessage
     }
     // METHODS
-    //handlers
-    #onOpen(event){
-        //TODO:
-        console.log("Open Event:", event)
-    }
-    #onClose(event){
-        //TODO:
-        console.log("Close Event:", event)
-    }
+    //handler
     #onMessage(event){
         console.log("Message Event:", event)
         //TODO:
@@ -43,7 +35,7 @@ class ChessApi{
                 this.#listeners.updateChessPiecePosition.forEach((listener) => {
                     const chessPieceId = 1
                     const position = ""
-                    listener(chessPieceId, type)
+                    listener(chessPieceId, position)
                 })
                 break;
         }
@@ -66,7 +58,7 @@ class ChessApi{
     }
 
     // ACTIONS
-    move(chessPieceId, moviment){
+    moveChessPiece(chessPieceId, moviment){
         if(chessPieceId && moviment && Number.isInteger(moviment)){
             this.#sendJson({
                 "chessPieceId": chessPieceId,
