@@ -3,6 +3,7 @@ class ChessController{
         api.registerListener(ChessEventType.EVENTS_TYPES.updateChessPiecePosition, this.#onUpdateChessPiecePosition)
         api.registerListener(ChessEventType.EVENTS_TYPES.destroyChessPiece, this.#onDestroyChessPiece)
         api.registerListener(ChessEventType.EVENTS_TYPES.changeChessPieceType, this.#onChangeChessPieceType)
+        api.registerListener(ChessEventType.EVENTS_TYPES.playerTime, this.#onChangePlayerTime)
     }
 
     //TODO:
@@ -14,5 +15,8 @@ class ChessController{
     }
     #onChangeChessPieceType(chessPieceId, type){
         console.log("onChangeChessPieceType:", chessPieceId, type)
+    }
+    #onChangePlayerTime(playerTime){
+        console.log("onChangePlayerTime:", playerTime)
     }
 }

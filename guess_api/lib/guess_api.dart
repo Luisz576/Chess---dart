@@ -1,36 +1,46 @@
 import 'dart:io';
 
+import 'package:guess_api/models/chess_data.dart';
+
 class GuessApi{
   final String address;
   final int port;
 
-  late final ServerSocket _server;
-  final List<Socket> _clients = [];
+  late final HttpServer _server;
+  final List<WebSocket> _clients = [];
 
   GuessApi._(this.address, this.port);
 
   run() async{
-    _server = await ServerSocket.bind(address, port);
-    _server.listen(_handle);
+    _server = await HttpServer.bind(address, port);
+    _server.listen((req) async {
+      if(req.uri.path == '/ws'){
+        try{
+          final socket = await WebSocketTransformer.upgrade(req);
+          this._clients.add(socket);
+          socket.listen(_handleSocket,
+            onDone: () {
+              print("done");
+            },
+            onError: (error){
+              print(error);
+            }
+          );
+        }catch(e){
+          print(e);
+        }
+      }
+    });
   }
 
-  _handle(Socket client){
-    client.listen((data) {
-      final message = String.fromCharCodes(data);
+  _handleSocket(data){
+    print("data: $data");
+    //TODO:
+  }
 
-      for(final c in _clients){
-        c.write("Server: $message just joined");
-      }
-      //TODO
-
-      _clients.add(client);
-      client.write("Server: You are logged in as $message");
-    }, onDone: (){
-      print("Server: Client left");
-      client.close();
-    }, onError: (error){
-      print(error);
-      client.close();
+  _broadcast(ChessData data){
+    _clients.forEach((client) {
+      client.add(data.toJson());
     });
   }
 }

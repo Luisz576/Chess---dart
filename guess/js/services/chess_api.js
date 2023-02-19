@@ -3,7 +3,8 @@ class ChessApi{
     #listeners = {
         "updateChessPiecePosition": [],
         "changeChessPieceType": [],
-        "destroyChessPiece": []
+        "destroyChessPiece": [],
+        "playerTime": []
     }
 
     constructor(address, onOpen = (_event) => {}, onClose = (_event) => {}){
@@ -15,30 +16,50 @@ class ChessApi{
     // METHODS
     //handler
     #onMessage(event){
-        console.log("Message Event:", event)
-        //TODO:
-        switch(event['type']){
-            case ChessEventType.EVENTS_TYPES.changeChessPieceType:
-                this.#listeners.changeChessPieceType.forEach((listener) => {
-                    const chessPieceId = 1
-                    const type = ""
-                    listener(chessPieceId, type)
-                })
-                break;
-            case ChessEventType.EVENTS_TYPES.destroyChessPiece:
-                this.#listeners.destroyChessPiece.forEach((listener) => {
-                    const chessPieceId = 1
-                    listener(chessPieceId)
-                })
-                break;  
-            case ChessEventType.EVENTS_TYPES.updateChessPiecePosition:
-                this.#listeners.updateChessPiecePosition.forEach((listener) => {
-                    const chessPieceId = 1
-                    const position = ""
-                    listener(chessPieceId, position)
-                })
-                break;
+        if(event['data']){
+            try{
+                const data = JSON.parse(event['data'])
+                this.#handleOnReceiveData(data)
+            }catch(e){
+                console.log(e)
+            }
         }
+    }
+    #handleOnReceiveData(data){
+        if(data['data_type']){
+            switch(data['data_type']){
+                case ChessEventType.EVENTS_TYPES.changeChessPieceType:
+                    const chessPieceIdT = data["chess_piece_id"];
+                    const type = data["chess_piece_type"];
+                    if(chessPieceIdT && type){
+                        this.#listeners.changeChessPieceType.forEach((listener) => {
+                            if(chessPieceId && type){
+                                listener(chessPieceIdT, type)
+                            }
+                        })
+                    }
+                    break;
+                case ChessEventType.EVENTS_TYPES.destroyChessPiece:
+                    const chessPieceIdD = data["chess_piece_id"];
+                    if(chessPieceIdD){
+                        this.#listeners.destroyChessPiece.forEach((listener) => {
+                            listener(chessPieceIdD)
+                        })
+                    }
+                    break;  
+                case ChessEventType.EVENTS_TYPES.updateChessPiecePosition:
+                    const chessPieceId = 1
+                    const position = data["chess_piece_position"]
+                    if(chessPieceId && position){
+                        this.#listeners.updateChessPiecePosition.forEach((listener) => {
+                            listener(chessPieceId, position)
+                        })
+                    }
+                    break;
+            }
+            return;
+        }
+        console.error(`Invalid Data: ${data}`)
     }
     //send
     #send(message){
@@ -59,10 +80,10 @@ class ChessApi{
 
     // ACTIONS
     moveChessPiece(chessPieceId, moviment){
-        if(chessPieceId && moviment && Number.isInteger(moviment)){
+        if(chessPieceId && moviment && Number.isInteger(moviment['id'])){
             this.#sendJson({
                 "chessPieceId": chessPieceId,
-                "moviment": moviment
+                "moviment": moviment['id']
             })
         }
     }

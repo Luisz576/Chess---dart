@@ -2,37 +2,45 @@ class ChessPieceMoviment{
     static CHESS_PIECE_MOVIMENTS = {
         "king": {
             // DIREITA
-            0: {
-                "x": 1,
-                "y": 0
+            "right": {
+                "x": 0,
+                "y": 1,
+                "id": 0
             },
-            1: {
+            "right_top": {
                 "x": 1,
-                "y": 0
+                "y": 1,
+                "id": 1
             },
-            2: {
+            "right_down": {
                 "x": 1,
-                "y": 0
+                "y": -1,
+                "id": 2
             },
-            3: {
-                "x": 1,
-                "y": 0
+            "left": {
+                "x": -1,
+                "y": 0,
+                "id": 3
             },
-            4: {
-                "x": 1,
-                "y": 0
+            "left_top": {
+                "x": -1,
+                "y": 1,
+                "id": 4
             },
-            5: {
-                "x": 1,
-                "y": 0
+            "left_down": {
+                "x": -1,
+                "y": -1,
+                "id": 5
             },
-            6: {
-                "x": 1,
-                "y": 0
+            "top": {
+                "x": 0,
+                "y": 1,
+                "id": 6
             },
-            7: {
-                "x": 1,
-                "y": 0
+            "down": {
+                "x": 0,
+                "y": -1,
+                "id": 7
             },
         }
     }
