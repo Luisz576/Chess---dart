@@ -1,10 +1,13 @@
 class ChessApi{
     #socket
     #listeners = {
+        "connection": [],
+        "chessPieceCreate": [],
         "updateChessPiecePosition": [],
         "changeChessPieceType": [],
         "destroyChessPiece": [],
-        "playerTime": []
+        "playerTime": [],
+        "playerWin": []
     }
 
     constructor(address, onOpen = (_event) => {}, onClose = (_event) => {}){
@@ -28,14 +31,31 @@ class ChessApi{
     #handleOnReceiveData(data){
         if(data['data_type']){
             switch(data['data_type']){
+                case ChessEventType.EVENTS_TYPES.connection:
+                    const player = data["player"]
+                    const is_player = data["is_player"]
+                    if(Number.isInteger(player)){
+                        this.#listeners.connection.forEach((listener) => {
+                            listener(player, is_player)
+                        })
+                    }
+                    break;
+                case ChessEventType.EVENTS_TYPES.chessPieceCreate:
+                    const piece_id = data["piece_id"]
+                    const piece_type = data["piece_type"]
+                    const piece_position = data["piece_position"]
+                    if(Number.isInteger(piece_id) && piece_type && piece_position){
+                        this.#listeners.chessPieceCreate.forEach((listener) => {
+                            listener(piece_id, piece_type, piece_position)
+                        })
+                    }
+                    break;
                 case ChessEventType.EVENTS_TYPES.changeChessPieceType:
                     const chessPieceIdT = data["chess_piece_id"];
                     const type = data["chess_piece_type"];
                     if(chessPieceIdT && type){
                         this.#listeners.changeChessPieceType.forEach((listener) => {
-                            if(chessPieceId && type){
-                                listener(chessPieceIdT, type)
-                            }
+                            listener(chessPieceIdT, type)
                         })
                     }
                     break;
@@ -53,6 +73,22 @@ class ChessApi{
                     if(chessPieceId && position){
                         this.#listeners.updateChessPiecePosition.forEach((listener) => {
                             listener(chessPieceId, position)
+                        })
+                    }
+                    break;
+                case ChessEventType.EVENTS_TYPES.playerTime:
+                    const playerTime = data["player_time"]
+                    if(Number.isInteger(playerTime)){
+                        this.#listeners.playerTime.forEach((listener) => {
+                            listener(playerTime)
+                        })
+                    }
+                    break;
+                case ChessEventType.EVENTS_TYPES.playerWin:
+                    const playerWin = data["player_win"]
+                    if(Number.isInteger(playerWin)){
+                        this.#listeners.playerWin.forEach((listener) => {
+                            listener(playerWin)
                         })
                     }
                     break;

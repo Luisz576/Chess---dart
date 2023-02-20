@@ -1,4 +1,5 @@
 enum ChessPieceType{
+  none("none"),
   king("king"),
   queen("queen"),
   tower("tower"),

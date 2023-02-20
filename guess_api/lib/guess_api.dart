@@ -1,15 +1,19 @@
 import 'dart:io';
 
-import 'package:guess_api/models/chess_data.dart';
+import 'package:guess_api/models/chess_game.dart';
+import 'package:guess_api/models/chess_packet.dart';
 
 class GuessApi{
   final String address;
   final int port;
+  late final ChessGame chessGame;
 
   late final HttpServer _server;
   final List<WebSocket> _clients = [];
 
-  GuessApi._(this.address, this.port);
+  GuessApi._(this.address, this.port){
+    this.chessGame = ChessGame();
+  }
 
   run() async{
     _server = await HttpServer.bind(address, port);
@@ -21,9 +25,11 @@ class GuessApi{
           socket.listen(_handleSocket,
             onDone: () {
               print("done");
+              this._clients.remove(socket);
             },
             onError: (error){
-              print(error);
+              print("Error: $error");
+              this._clients.remove(socket);
             }
           );
         }catch(e){
@@ -38,14 +44,13 @@ class GuessApi{
     //TODO:
   }
 
-  _broadcast(ChessData data){
+  _broadcast(ChessPacket packet){
     _clients.forEach((client) {
-      client.add(data.toJson());
+      client.add(packet.toJson());
     });
   }
 }
 
 runServer(String address, int port){
-  final guessApi = GuessApi._(address, port);
-  guessApi.run();
+  GuessApi._(address, port).run();
 }
