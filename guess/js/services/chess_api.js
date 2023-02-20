@@ -2,6 +2,7 @@ class ChessApi{
     #socket
     #listeners = {
         "connection": [],
+        "playerJoinOrQuit": [],
         "chessPieceCreate": [],
         "updateChessPiecePosition": [],
         "changeChessPieceType": [],
@@ -14,7 +15,7 @@ class ChessApi{
         this.#socket = new WebSocket(address)
         this.#socket.onopen = onOpen
         this.#socket.onclose = onClose
-        this.#socket.onmessage = this.#onMessage
+        this.#socket.onmessage = this.#onMessage.bind(this)
     }
     // METHODS
     //handler
@@ -39,6 +40,12 @@ class ChessApi{
                             listener(player, is_player)
                         })
                     }
+                    break;
+                case ChessEventType.EVENTS_TYPES.playerJoinOrQuit:
+                    const hasJoined = data["has_joined"]
+                    this.#listeners.playerJoinOrQuit.forEach((listener) => {
+                        listener(hasJoined)
+                    })
                     break;
                 case ChessEventType.EVENTS_TYPES.chessPieceCreate:
                     const piece_id = data["piece_id"]

@@ -9,27 +9,31 @@ class ChessPacket{
   final Map<String, dynamic> _data = {};
 
   ChessPacket.connection(int player){
-    this.dataType = ChessPacketType.connection;
+    dataType = ChessPacketType.connection;
     write("player", player);
     write("is_player", player == 1 || player == 2);
   }
+  ChessPacket.playerJoinOrQuit(hasJoined){
+    dataType = ChessPacketType.playerJoinOrQuit;
+    write("has_joined", hasJoined);
+  }
   ChessPacket.chessPieceCreate(ChessPiece piece, int id){
-    this.dataType = ChessPacketType.chessPieceCreate;
+    dataType = ChessPacketType.chessPieceCreate;
     write("piece_id", id);
     write("piece_type", piece.chessPieceType.value);
     write("piece_position", piece.xy);
   }
   ChessPacket.changeChessPieceType(int chessPieceId, ChessPieceType chessPieceType){
-    this.dataType = ChessPacketType.changeChessPieceType;
+    dataType = ChessPacketType.changeChessPieceType;
     write("chess_piece_id", chessPieceId);
     write("chess_piece_type", chessPieceType.value);
   }
   ChessPacket.destroyChessPiece(int chessPieceId){
-    this.dataType = ChessPacketType.destroyChessPiece;
+    dataType = ChessPacketType.destroyChessPiece;
     write("chess_piece_id", chessPieceId);
   }
   ChessPacket.updateChessPiecePosition(int chessPieceId, int x, int y){
-    this.dataType = ChessPacketType.updateChessPiecePosition;
+    dataType = ChessPacketType.updateChessPiecePosition;
     write("chess_piece_id", chessPieceId);
     write("chess_piece_position", {
       "x": x,
@@ -37,11 +41,11 @@ class ChessPacket{
     });
   }
   ChessPacket.playerTime(int player){
-    this.dataType = ChessPacketType.playerTime;
+    dataType = ChessPacketType.playerTime;
     write("player_time", player);
   }
   ChessPacket.playerWin(int player){
-    this.dataType = ChessPacketType.playerWin;
+    dataType = ChessPacketType.playerWin;
     write("player_win", player);
   }
 

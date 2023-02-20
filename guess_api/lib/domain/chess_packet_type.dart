@@ -1,5 +1,6 @@
 enum ChessPacketType{
   connection("connection"),
+  playerJoinOrQuit("playerJoinOrQuit"),
   chessPieceCreate("chessPieceCreate"),
   updateChessPiecePosition("updateChessPiecePosition"),
   changeChessPieceType("changeChessPieceType"),
