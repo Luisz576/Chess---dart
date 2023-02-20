@@ -4,7 +4,8 @@ class CHESS_PIECE_TYPES{
         "queen": "queen",
         "tower": "tower",
         "knight": "knight",
-        //TODO:
+        "pawn": "pawn",
+        "bishop": "bishop"
     }
 
     static fromValue(value){

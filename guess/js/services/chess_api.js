@@ -79,11 +79,12 @@ class ChessApi{
     }
 
     // ACTIONS
-    moveChessPiece(chessPieceId, moviment){
+    moveChessPiece(chessPieceId, moviment, value){
         if(chessPieceId && moviment && Number.isInteger(moviment['id'])){
             this.#sendJson({
                 "chessPieceId": chessPieceId,
-                "moviment": moviment['id']
+                "moviment": moviment['id'],
+                "value": value
             })
         }
     }

@@ -2,8 +2,9 @@ enum ChessPieceType{
   king("king"),
   queen("queen"),
   tower("tower"),
-  knight("knight");
-  //TODO:
+  knight("knight"),
+  pawn("pawn"),
+  bishop("bishop");
 
   final String value;
 
