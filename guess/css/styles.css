@@ -50,8 +50,11 @@ body{
 }
 .chess-game{
     height: 100%;
-    background-color: tomato;
+    display: flex;
+    padding-top: 40px;
+    justify-content: center;
+    background-color: dimgray;
 }
 #chess-canvas{
-    background-color: aqua;
+    border: 1px solid tomato
 }

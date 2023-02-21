@@ -51,9 +51,10 @@ class ChessApi{
                     const piece_id = data["piece_id"]
                     const piece_type = data["piece_type"]
                     const piece_position = data["piece_position"]
+                    const piece_owner = data["piece_owner"]
                     if(Number.isInteger(piece_id) && piece_type && piece_position){
                         this.#listeners.chessPieceCreate.forEach((listener) => {
-                            listener(piece_id, piece_type, piece_position)
+                            listener(piece_id, piece_type, piece_position, piece_owner)
                         })
                     }
                     break;
@@ -124,10 +125,11 @@ class ChessApi{
 
     // ACTIONS
     moveChessPiece(chessPieceId, moviment, value){
-        if(chessPieceId && moviment && Number.isInteger(moviment['id'])){
+        if(chessPieceId && Number.isInteger(moviment)){
             this.#sendJson({
+                "type": "clientPacket",
                 "chessPieceId": chessPieceId,
-                "moviment": moviment['id'],
+                "moviment": moviment,
                 "value": value
             })
         }

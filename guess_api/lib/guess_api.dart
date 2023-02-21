@@ -1,6 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:guess_api/domain/chess_packet_type.dart';
 import 'package:guess_api/extension/websocketsender_extension.dart';
+import 'package:guess_api/models/chess_client_packet.dart';
 import 'package:guess_api/models/chess_game.dart';
 import 'package:guess_api/models/chess_packet.dart';
 
@@ -12,6 +15,7 @@ class GuessApi{
   late final HttpServer _server;
   final List<WebSocket> _clients = [];
   WebSocket? p1, p2;
+  int currentPlayer = 1;
 
   GuessApi._(this.address, this.port){
     chessGame = ChessGame();
@@ -74,8 +78,39 @@ class GuessApi{
   }
 
   _handleSocket(socket, data){
-    print("data: $data");
-    //TODO:
+    Map json = {};
+    try{
+      json = jsonDecode(data);
+    }catch(e){
+      print(e);
+      return;
+    }
+    if(json["type"] == "clientPacket"){
+      int p = socket == p1 ? 1 : socket == p2 ? 2 : -1;
+      if(p != -1){
+        if(currentPlayer != p){
+          return;
+        }
+        late ChessClientPacket clientPacket;
+        try{
+          clientPacket = ChessClientPacket.fromPacket(json);
+        }catch(e){
+          print(e);
+          return;
+        }
+        ChessPacket? packet = chessGame.moveChessPieceHandler(p, clientPacket.chessPieceId, clientPacket.movimentId, clientPacket.value);
+        if(packet == null){
+          return;
+        }
+        _broadcast(packet);
+        if(packet.dataType == ChessPacketType.playerWin){
+          //TODO: delay to reload
+          return;
+        }
+        currentPlayer = currentPlayer == 1 ? 2 : 1;
+        _broadcast(ChessPacket.playerTime(currentPlayer));
+      }
+    }
   }
 
   _broadcast(ChessPacket packet){
