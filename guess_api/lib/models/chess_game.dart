@@ -12,25 +12,31 @@ class ChessGame{
   _start(){
     // WHITE
     //king
-    _createChessPiece(ChessPieceType.king, 3, 0);
+    _createChessPiece(ChessPieceType.king, 3, 0, 1);
+    _createChessPiece(ChessPieceType.king, 4, 7, 2);
     //quee
-    _createChessPiece(ChessPieceType.queen, 4, 0);
-    // BLACK
+    _createChessPiece(ChessPieceType.queen, 4, 0, 1);
+    _createChessPiece(ChessPieceType.queen, 3, 7, 1);
+    //pawn
+    for(int i = 0; i < 8; i++){
+      _createChessPiece(ChessPieceType.pawn, i, 1, 1);
+      _createChessPiece(ChessPieceType.pawn, i, 6, 2);
+    }
     //TODO: create
   }
 
-  ChessPacket _createChessPiece(ChessPieceType type, int x, int y){
-    final chessPiece = ChessPiece(type);
+  ChessPacket _createChessPiece(ChessPieceType type, int x, int y, int owner){
+    final chessPiece = ChessPiece(type, owner);
     chessPiece.updatePosition(x, y);
-    this._pieces.add(chessPiece);
-    return ChessPacket.chessPieceCreate(chessPiece, this._pieces.length - 1);
+    _pieces.add(chessPiece);
+    return ChessPacket.chessPieceCreate(chessPiece, _pieces.length - 1);
   }
 
   //PUBLIC
   List<ChessPacket> getAllChessGamePackets(){
     List<ChessPacket> packets = [];
-    for(int i = 0; i < this._pieces.length; i++){
-      packets.add(ChessPacket.chessPieceCreate(this._pieces[i], i));
+    for(int i = 0; i < _pieces.length; i++){
+      packets.add(ChessPacket.chessPieceCreate(_pieces[i], i));
     }
     return packets;
   }
@@ -40,7 +46,7 @@ class ChessGame{
   }
 
   ChessPacket? moveChessPiece(int chessPieceId, int moviment){
-    if(chessPieceId > -1 && chessPieceId < this._pieces.length){
+    if(chessPieceId > -1 && chessPieceId < _pieces.length){
       final pieceMoviment = _pieces[chessPieceId].getMoviment(moviment);
       //TODO: calculate
       return ChessPacket.playerWin(1);

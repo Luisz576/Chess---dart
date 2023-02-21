@@ -45,17 +45,6 @@ body{
 .header-creator a:hover{
     text-decoration: underline;
 }
-.header-btn{
-    background: transparent;
-    color: var(--white-color);
-    font-size: 1.2rem;
-    align-self: center;
-    border: none;
-}
-.header-btn:hover{
-    cursor: pointer;
-    text-decoration: underline;
-}
 .header-btn.connecting:hover{
     cursor: default;
 }

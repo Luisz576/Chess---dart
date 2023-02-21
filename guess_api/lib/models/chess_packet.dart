@@ -22,6 +22,7 @@ class ChessPacket{
     write("piece_id", id);
     write("piece_type", piece.chessPieceType.value);
     write("piece_position", piece.xy);
+    write("piece_owner", piece.owner);
   }
   ChessPacket.changeChessPieceType(int chessPieceId, ChessPieceType chessPieceType){
     dataType = ChessPacketType.changeChessPieceType;

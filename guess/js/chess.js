@@ -3,7 +3,7 @@ class ChessGame{
     #api
     #running = false
     #chessController
-    #gameLoop
+    gameLoop
 
     constructor(chessCanvas){
         if(!chessCanvas){
@@ -17,25 +17,34 @@ class ChessGame{
         //TODO: load map
     }
     #onClose(event){
-        console.log("Desconectado!", event)
-        //TODO: clear board
+        console.log("Disconectado!")
+        if(this.gameLoop != -1){
+            clearInterval(this.gameLoop);
+        }
     }
 
     #gameRun(){
-        //TODO:
+        this.#chessController.renderTable()
     }
     
     isRunning(){
         return this.#running
     }
 
-    startup(frames=30){
+    startup(frames=5){
         if(this.isRunning())
 			throw "This game is already running!"
-        this.#gameLoop = setInterval(this.#gameRun.bind(this), 1000/frames)
+        this.gameLoop = setInterval(this.#gameRun.bind(this), 1000/frames)
         this.#running = true
         this.#api = new ChessApi('ws://127.0.0.1:5760/ws', this.#onOpen, this.#onClose)
-        this.#chessController = new ChessController(this.#chessCanvas, this.#api)
+        this.#chessController = new ChessController(this.#chessCanvas, this.#api, this.#callbackOnConnection.bind(this))
+    }
+
+    #callbackOnConnection(isPlayer){
+        if(!isPlayer){
+            clearInterval(this.gameLoop);
+            this.gameLoop = -1
+        }
     }
 }
 

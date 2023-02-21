@@ -2,48 +2,48 @@ import 'package:guess_api/domain/chess_piece_type.dart';
 
 enum ChessPieceMoviment{
   none(0, 0),
-  king_top(0, 1),
-  king_right(1, 0),
-  king_right_top(1, 1),
-  king_right_down(1, -1),
-  king_left(-1, 0),
-  king_left_top(-1, 1),
-  king_left_down(-1, -1),
-  king_down(0, -1),
-  queen_top(0, 10),
-  queen_right(10, 0),
-  queen_right_top(10, 10),
-  queen_right_down(10, -10),
-  queen_left(-10, 0),
-  queen_left_top(-10, 10),
-  queen_left_down(-10, -10),
-  queen_down(0, -10),
-  tower_top(0, 10),
-  tower_down(0, -10),
-  tower_right(10, 0),
-  tower_left(-10, 0),
-  knight_top_top_left(-1, 2),
-  knight_top_top_right(1, 2),
-  knight_top_left_left(-2, 1),
-  knight_top_right_right(2, 1),
-  knight_down_down_left(-1, -2),
-  knight_down_down_right(1, -2),
-  knight_down_left_left(-2, 1),
-  knight_down_right_right(-2, -1),
-  pawn_top(0, 1),
-  pawn_attack_right(1, 1),
-  pawn_attack_left(-1, 1);
+  kingTop(0, 1),
+  kingRight(1, 0),
+  kingRightTop(1, 1),
+  kingRightDown(1, -1),
+  kingLeft(-1, 0),
+  kingLeftTop(-1, 1),
+  kingLeftDown(-1, -1),
+  kingDown(0, -1),
+  queenTop(0, 10),
+  queenRight(10, 0),
+  queenRightTop(10, 10),
+  queenRightDown(10, -10),
+  queenLeft(-10, 0),
+  queenLeftTop(-10, 10),
+  queenLeftDown(-10, -10),
+  queenDown(0, -10),
+  towerTop(0, 10),
+  towerDown(0, -10),
+  towerRight(10, 0),
+  towerLeft(-10, 0),
+  knightTopTopLeft(-1, 2),
+  knightTopTopRight(1, 2),
+  knightTopLeftLeft(-2, 1),
+  knightTopRightRight(2, 1),
+  knightDownDownLeft(-1, -2),
+  knightDownDownRight(1, -2),
+  knightDownLeftLeft(-2, 1),
+  knightDownRightRight(-2, -1),
+  pawnTop(0, 1),
+  pawnAttackRight(1, 1),
+  pawnAttackLeft(-1, 1);
   //TODO:
 
-  final x, y;
+  final int x, y;
   bool get isXIlimited => x == 10 || x == -10;
   bool get isYIlimited => y == 10 || y == -10;
 
   const ChessPieceMoviment(this.x, this.y);
 
   static bool onlyToAttack(ChessPieceMoviment moviment){
-    return moviment == ChessPieceMoviment.pawn_attack_right
-        || moviment == ChessPieceMoviment.pawn_attack_left;
+    return moviment == ChessPieceMoviment.pawnAttackRight
+        || moviment == ChessPieceMoviment.pawnAttackLeft;
   }
 
   static ChessPieceMoviment fromData(ChessPieceType chessPieceType, int moviment){
@@ -51,73 +51,73 @@ enum ChessPieceMoviment{
       case ChessPieceType.king:
         switch(moviment){
           case 0:
-            return ChessPieceMoviment.king_right;
+            return ChessPieceMoviment.kingRight;
           case 1:
-            return ChessPieceMoviment.king_right_top;
+            return ChessPieceMoviment.kingRightTop;
           case 2:
-            return ChessPieceMoviment.king_right_down;
+            return ChessPieceMoviment.kingRightDown;
           case 3:
-            return ChessPieceMoviment.king_left;
+            return ChessPieceMoviment.kingLeft;
           case 4:
-            return ChessPieceMoviment.king_left_top;
+            return ChessPieceMoviment.kingLeftTop;
           case 5:
-            return ChessPieceMoviment.king_left_down;
+            return ChessPieceMoviment.kingLeftDown;
           case 6:
-            return ChessPieceMoviment.king_top;
+            return ChessPieceMoviment.kingTop;
           case 7:
-            return ChessPieceMoviment.king_down;
+            return ChessPieceMoviment.kingDown;
         }
         break;
       case ChessPieceType.queen:
         switch(moviment){
           case 0:
-            return ChessPieceMoviment.queen_right;
+            return ChessPieceMoviment.queenRight;
           case 1:
-            return ChessPieceMoviment.queen_right_top;
+            return ChessPieceMoviment.queenRightTop;
           case 2:
-            return ChessPieceMoviment.queen_right_down;
+            return ChessPieceMoviment.queenRightDown;
           case 3:
-            return ChessPieceMoviment.queen_left;
+            return ChessPieceMoviment.queenLeft;
           case 4:
-            return ChessPieceMoviment.queen_left_top;
+            return ChessPieceMoviment.queenLeftTop;
           case 5:
-            return ChessPieceMoviment.queen_left_down;
+            return ChessPieceMoviment.queenLeftDown;
           case 6:
-            return ChessPieceMoviment.queen_top;
+            return ChessPieceMoviment.queenTop;
           case 7:
-            return ChessPieceMoviment.queen_down;
+            return ChessPieceMoviment.queenDown;
         }
         break;
       case ChessPieceType.tower:
         switch(moviment){
           case 0:
-            return ChessPieceMoviment.tower_top;
+            return ChessPieceMoviment.towerTop;
           case 1:
-            return ChessPieceMoviment.tower_down;
+            return ChessPieceMoviment.towerDown;
           case 2:
-            return ChessPieceMoviment.tower_right;
+            return ChessPieceMoviment.towerRight;
           case 3:
-            return ChessPieceMoviment.tower_left;
+            return ChessPieceMoviment.towerLeft;
         }
         break;
       case ChessPieceType.knight:
         switch(moviment){
           case 0:
-            return ChessPieceMoviment.knight_top_top_left;
+            return ChessPieceMoviment.knightTopTopLeft;
           case 1:
-            return ChessPieceMoviment.knight_top_top_right;
+            return ChessPieceMoviment.knightTopTopRight;
           case 2:
-            return ChessPieceMoviment.knight_top_left_left;
+            return ChessPieceMoviment.knightTopLeftLeft;
           case 3:
-            return ChessPieceMoviment.knight_top_right_right;
+            return ChessPieceMoviment.knightTopRightRight;
           case 4:
-            return ChessPieceMoviment.knight_down_down_left;
+            return ChessPieceMoviment.knightDownDownLeft;
           case 5:
-            return ChessPieceMoviment.knight_down_down_right;
+            return ChessPieceMoviment.knightDownDownRight;
           case 6:
-            return ChessPieceMoviment.knight_down_left_left;
+            return ChessPieceMoviment.knightDownLeftLeft;
           case 7:
-            return ChessPieceMoviment.knight_down_right_right;
+            return ChessPieceMoviment.knightDownRightRight;
         }
         break;
       case ChessPieceType.bishop:
@@ -126,12 +126,14 @@ enum ChessPieceMoviment{
       case ChessPieceType.pawn:
         switch(moviment){
           case 0:
-            return ChessPieceMoviment.pawn_top;
+            return ChessPieceMoviment.pawnTop;
           case 1:
-            return ChessPieceMoviment.pawn_attack_right;
+            return ChessPieceMoviment.pawnAttackRight;
           case 2:
-            return ChessPieceMoviment.pawn_attack_left;
+            return ChessPieceMoviment.pawnAttackLeft;
         }
+        break;
+      case ChessPieceType.none:
         break;
     }
     return ChessPieceMoviment.none;

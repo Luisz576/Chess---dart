@@ -58,11 +58,12 @@ class ChessApi{
                     }
                     break;
                 case ChessEventType.EVENTS_TYPES.changeChessPieceType:
-                    const chessPieceIdT = data["chess_piece_id"];
-                    const type = data["chess_piece_type"];
-                    if(chessPieceIdT && type){
+                    const chessPieceIdT = data["chess_piece_id"]
+                    const type = data["chess_piece_type"]
+                    const owner = data["piece_owner"]
+                    if(chessPieceIdT && type && owner){
                         this.#listeners.changeChessPieceType.forEach((listener) => {
-                            listener(chessPieceIdT, type)
+                            listener(chessPieceIdT, type, owner)
                         })
                     }
                     break;
