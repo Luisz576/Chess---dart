@@ -43,17 +43,17 @@ class ChessGame{
   }
 
   ChessPacket _createChessPiece(ChessPieceType type, int x, int y, int owner){
-    final chessPiece = ChessPiece(type, owner);
+    final chessPiece = ChessPiece(type, owner, _pieces.length);
     chessPiece.updatePosition(x, y);
     _pieces.add(chessPiece);
-    return ChessPacket.chessPieceCreate(chessPiece, _pieces.length - 1);
+    return ChessPacket.chessPieceCreate(chessPiece);
   }
 
   //PUBLIC
   List<ChessPacket> getAllChessGamePackets(){
     List<ChessPacket> packets = [];
     for(int i = 0; i < _pieces.length; i++){
-      packets.add(ChessPacket.chessPieceCreate(_pieces[i], i));
+      packets.add(ChessPacket.chessPieceCreate(_pieces[i]));
     }
     return packets;
   }
@@ -70,10 +70,23 @@ class ChessGame{
     return packets;
   }
 
-  ChessPacket? moveChessPieceHandler(int player, int chessPieceId, int moviment, int value){
+  ChessPiece? _getPieceAt(int x, int y){
+    for(ChessPiece piece in _pieces){
+      if(piece.x == x && piece.y == y){
+        return piece;
+      }
+    }
+    return null;
+  }
+
+  List<ChessPacket>? moveChessPieceHandler(int player, int chessPieceId, int moviment, int value){
     if(chessPieceId > -1 && chessPieceId < _pieces.length && _pieces[chessPieceId].owner == player){
       ChessPiece piece = _pieces[chessPieceId];
       ChessPieceMoviment pieceMoviment = piece.getMoviment(moviment);
+
+      if((pieceMoviment.onlyIfPlayer1() && player == 2) || (pieceMoviment.onlyIfPlayer2() && player == 1)){
+        return null;
+      }
 
       int movimentX = 0, movimentY = 0;
       if(pieceMoviment.isXIlimited){
@@ -86,13 +99,50 @@ class ChessGame{
       }else{
         movimentY = pieceMoviment.y;
       }
+      int newLocX = piece.x + movimentX, newLocY = piece.y + movimentY;
 
-      //TODO: ver se não tem carinha do time no caminho
-      //TODO: ver se não é apenas para ataque
-      //TODO: ver se não tem peça no caminho, caso não possa realizar pulos (se tiver não se mover)
+      if(newLocX < 0 || newLocX > 7 || newLocY < 0 || newLocY > 7){
+        return null;
+      }
+
+      if(!pieceMoviment.canJump()){
+        if(_hasPieceInWay(piece.x, piece.y, newLocX, newLocY)){
+          return null;
+        }
+      }
+
+      ChessPiece? target = _getPieceAt(newLocX, newLocY);
+      if(target == null){
+        if(pieceMoviment.onlyToAttack()){
+          return null;
+        }
+        return [ChessPacket.updateChessPiecePosition(chessPieceId, movimentX, movimentY)];
+      }
       
-      return ChessPacket.updateChessPiecePosition(chessPieceId, movimentX, movimentY);
+      if(target.owner == player){
+        return null;
+      }
+
+      if(pieceMoviment.onlyToMove()){
+        return null;
+      }
+
+      return [ChessPacket.destroyChessPiece(target.id),
+        ChessPacket.updateChessPiecePosition(chessPieceId, movimentX, movimentY)];
     }
     return null;
+  }
+
+  bool _hasPieceInWay(int startX, int startY, int endX, int endY){
+    int toX = startX > endX ? startX : endX,
+      toY = startY > endY ? startY : endY;
+    for(int y = startY > endY ? endY : startY; y < toY; y++){
+      for(int x = startX > endX ? endX : startX; x < toX; x++){
+        if(_getPieceAt(x, y) != null){
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

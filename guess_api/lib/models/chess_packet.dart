@@ -17,9 +17,9 @@ class ChessPacket{
     dataType = ChessPacketType.playerJoinOrQuit;
     write("has_joined", hasJoined);
   }
-  ChessPacket.chessPieceCreate(ChessPiece piece, int id){
+  ChessPacket.chessPieceCreate(ChessPiece piece){
     dataType = ChessPacketType.chessPieceCreate;
-    write("piece_id", id);
+    write("piece_id", piece.id);
     write("piece_type", piece.chessPieceType.value);
     write("piece_position", piece.xy);
     write("piece_owner", piece.owner);

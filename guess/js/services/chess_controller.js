@@ -53,14 +53,7 @@ class ChessController{
     #selectedPiece
 
     #onPlayerClick(clickPosition){
-        let cliquedPiece;
-        for(let k in this.#pieces){
-            let piece_position = this.#pieces[k]["piece_position"]
-            if(piece_position["x"] == clickPosition["x"] && piece_position["y"] == clickPosition["y"]){
-                cliquedPiece = this.#pieces[k];
-                break;
-            }
-        }
+        let cliquedPiece = this.#getPieceAt(clickPosition["x"], clickPosition["y"]);
         if(cliquedPiece){
             if(cliquedPiece["owner"] == this.#player){
                 this.#selectedPiece = cliquedPiece
@@ -81,11 +74,9 @@ class ChessController{
             for(let k in moviments){
                 //moviment logic
                 let moviment = moviments[k]
-                if(moviment["x"] != 10 && moviment["x"] != -10
-                    && moviment["y"] != 10 && moviment["y"] != -10){
-                    if(moviment["x"] == distance["x"] && moviment["y"] == distance["y"]){
-                        this.#sendMovimentPacket(this.#selectedPiece["piece_id"], moviment["id"], 1)
-                    }
+                if(this.#canDoThisMoviment(this.#selectedPiece, moviment, distance)){
+                    this.#sendMovimentPacket(this.#selectedPiece["piece_id"], moviment["id"], 1)
+                    break;
                 }
             }
             return;
@@ -99,15 +90,116 @@ class ChessController{
     #possibleMoviments = []
 
     #markPossibleMoviments(selectedPiece, moviments){
+        this.#clearPossibleMoviments()
+
+        for(let k in moviments){
+            let moviment = moviments[k]
+            if(this.#canDoThisMoviment(selectedPiece, moviment)){
+                this.#addPossibleMoviment(selectedPiece["piece_position"], moviment)
+            }
+        }
+    }
+
+    #canDoThisMoviment(selectedPiece, moviment, distance = -1){
+        let startX = selectedPiece["piece_position"]["x"];
+        let startY = selectedPiece["piece_position"]["y"];
+        if(distance == -1){
+            if(moviment["x"] != 10 && moviment["x"] != -10
+                && moviment["y"] != 10 && moviment["y"] != -10){
+                let endX = startX + moviment["x"]
+                let endY = startY + moviment["y"]
+                let target = this.#getPieceAt(endX, endY)
+                if(target != null){
+                    return target["owner"] != this.#player
+                }
+                return true;
+            }
+
+            let endX = -1;
+            let endY = -1;
+            let movimentXToLeft = moviment["x"] == -10
+            let movimentYToDown = moviment["y"] == -10
+            let movimentXToRight = moviment["x"] == 10
+            let movimentYToTop = moviment["y"] == 10
+            //TODO: REFORMULAR
+            // if(movimentXToLeft){
+            //     if(movimentYToDown){
+            //         //TODO:
+            //     }else if(movimentYToTop){
+            //         //TODO:
+            //     }else{
+            //         //TODO:
+            //     }
+            // }else if(movimentXToRight){
+            //     if(movimentYToDown){
+            //         //TODO:
+            //     }else if(movimentYToTop){
+            //         //TODO:
+            //     }else{
+            //         //TODO:
+            //     }
+            // }else{
+            //     if(movimentYToDown){
+            //         //TODO:
+            //     }else if(movimentYToTop){
+            //         //TODO:
+            //     }
+            // }
+
+            return false;
+        }
+
+        let endX = startX + distance["x"]
+        let endY = startY + distance["y"]
+
+        if(endX > 7 || endX < 0 || endY > 7 || endY < 0){
+            return false;
+        }
+
+        if(moviment["x"] != 10 && moviment["x"] != -10
+            && moviment["y"] != 10 && moviment["y"] != -10){
+            return moviment["x"] == distance["x"] && moviment["y"] == distance["y"]
+        }
+
+        let toY = startY > endY ? startY : endY
+        let toX = startX > endX ? startX : endX
+        for(let y = startY > endY ? endY : startY; y < toY; y++){
+            for(let x = startX > endX ? endX : startX; x < toX; x++){
+                if(_getPieceAt(x, y) != null){
+                    return false;
+                }
+            }
+        }
+
+        let target = _getPieceAt(toX, toY)
+        if(target != null){
+            return target["owner"] != this.#player
+        }
+        return true;
+    }
+
+    #getPieceAt(x, y){
+        for(let k in this.#pieces){
+            let piece_position = this.#pieces[k]["piece_position"]
+            if(piece_position["x"] == x && piece_position["y"] == y){
+                return this.#pieces[k]
+            }
+        }
+        return undefined;
+    }
+
+    #clearPossibleMoviments(){
         while (this.#possibleMoviments.length > 0) {
             this.#possibleMoviments.pop();
         }
-        
-        //TODO: fazer toda logíca de se pode mover
-        //TODO: salvar todos os blocos em #possibleMoviments
+    }
 
-        console.log(selectedPiece)
-        console.log(moviments)
+    #addPossibleMoviment(currentPosition, moviment){
+        this.#possibleMoviments.push({
+            "id": moviment["id"],
+            "x": currentPosition["x"] + moviment["x"],
+            "y": currentPosition["y"] + moviment["y"]
+        })
     }
 
     #onConnection(player, is_player){

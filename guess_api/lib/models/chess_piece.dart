@@ -3,7 +3,7 @@ import 'package:guess_api/domain/chess_piece_type.dart';
 
 class ChessPiece{
   late ChessPieceType _chessPieceType;
-  final int _owner;
+  final int owner, id;
   int _x = 0, _y = 0;
   bool _destroyed = false;
 
@@ -13,14 +13,12 @@ class ChessPiece{
   int get y => _y;
   List<int> get xy => [_x, _y];
 
-  int get owner => _owner;
-
   bool get destroyed => _destroyed;
   destroy(){
     _destroyed = true;
   }
 
-  ChessPiece(ChessPieceType chessPieceType, this._owner){
+  ChessPiece(ChessPieceType chessPieceType, this.owner, this.id){
     if(chessPieceType == ChessPieceType.none){
       throw "ChessPieceType cannot be 'none'";
     }

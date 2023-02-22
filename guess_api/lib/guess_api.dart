@@ -98,18 +98,24 @@ class GuessApi{
           print(e);
           return;
         }
-        ChessPacket? packet = chessGame.moveChessPieceHandler(p, clientPacket.chessPieceId, clientPacket.movimentId, clientPacket.value);
-        if(packet == null){
+        List<ChessPacket>? packets = chessGame.moveChessPieceHandler(p, clientPacket.chessPieceId, clientPacket.movimentId, clientPacket.value);
+        if(packets == null){
           return;
         }
-        _broadcast(packet);
-        if(packet.dataType == ChessPacketType.playerWin){
+        _broadcastAll(packets);
+        if(packets[packets.length - 1].dataType == ChessPacketType.playerWin){
           //TODO: delay to reload
           return;
         }
         currentPlayer = currentPlayer == 1 ? 2 : 1;
         _broadcast(ChessPacket.playerTime(currentPlayer));
       }
+    }
+  }
+
+  _broadcastAll(List<ChessPacket> packets){
+    for(ChessPacket packet in packets){
+      _broadcast(packet);
     }
   }
 

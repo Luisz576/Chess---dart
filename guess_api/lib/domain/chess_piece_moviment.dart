@@ -31,6 +31,7 @@ enum ChessPieceMoviment{
   knightDownLeftLeft(-2, 1),
   knightDownRightRight(-2, -1),
   pawnTop(0, 1),
+  pawnDown(0, -1),
   pawnAttackRight(1, 1),
   pawnAttackLeft(-1, 1);
   //TODO:
@@ -41,9 +42,37 @@ enum ChessPieceMoviment{
 
   const ChessPieceMoviment(this.x, this.y);
 
-  static bool onlyToAttack(ChessPieceMoviment moviment){
-    return moviment == ChessPieceMoviment.pawnAttackRight
-        || moviment == ChessPieceMoviment.pawnAttackLeft;
+  bool canJump(){
+    switch(this){
+      case knightTopTopLeft:
+      case knightTopTopRight:
+      case knightTopLeftLeft:
+      case knightTopRightRight:
+      case knightDownDownLeft:
+      case knightDownDownRight:
+      case knightDownLeftLeft:
+      case knightDownRightRight:
+        return true;
+      default:
+        return false;
+    }
+  }
+
+  bool onlyToAttack(){
+    return this == pawnAttackRight
+        || this == pawnAttackLeft;
+  }
+
+  bool onlyToMove(){
+    return this == pawnTop || this == pawnDown;
+  }
+
+  bool onlyIfPlayer1(){
+    return this == pawnDown;
+  }
+
+  bool onlyIfPlayer2(){
+    return this == pawnTop;
   }
 
   static ChessPieceMoviment fromData(ChessPieceType chessPieceType, int moviment){
