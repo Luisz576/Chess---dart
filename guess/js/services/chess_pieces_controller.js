@@ -35,9 +35,11 @@ class ChessPiecesController{
     }
 
     createPiece(piece_id, piece_type, piece_position, owner){
+        let type = CHESS_PIECE_TYPES.fromValue(piece_type)
         this.#pieces[piece_id] = {
             "piece_id": piece_id,
-            "piece_type": CHESS_PIECE_TYPES.fromValue(piece_type),
+            "piece_type": type,
+            "piece_image": CHESS_PIECE_TYPES.getImage(type, owner),
             "piece_position": {
                 "x": piece_position[0],
                 "y": piece_position[1]

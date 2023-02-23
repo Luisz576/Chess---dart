@@ -4,7 +4,6 @@ class ChessController{
     #render
     #piecesController
     #api
-    #callbackOnConnection
     #player = -1
     #allPlayersConnected = false
     #isPlayer = false
@@ -18,12 +17,11 @@ class ChessController{
         return this.#isPlayer
     }
 
-    constructor(canvas, api, tableResolution, callbackOnConnection){
+    constructor(canvas, api, tableResolution){
         this.#chessCanvas = canvas
         
         this.#tableResolution = tableResolution
         this.#api = api
-        this.#callbackOnConnection = callbackOnConnection
 
         this.#piecesController = new ChessPiecesController()
         this.#render = new ChessRender(canvas, tableResolution)
@@ -59,6 +57,7 @@ class ChessController{
             if(cliquedPiece["owner"] == this.#player){
                 this.#selectedPiece = cliquedPiece
                 this.#markPossibleMoviments(this.#selectedPiece, ChessPieceMoviment.CHESS_PIECE_MOVIMENTS[this.#selectedPiece["piece_type"]])
+                this.renderTable()
                 return;
             }
             //TODO: attack?
@@ -79,6 +78,7 @@ class ChessController{
                 if(this.#canDoThisMoviment(this.#selectedPiece, moviment, distance)){
                     this.#sendMovimentPacket(this.#selectedPiece["piece_id"], moviment["id"], 1)
                     this.#clearPossibleMoviments()
+                    this.renderTable()
                     break;
                 }
             }
@@ -123,6 +123,9 @@ class ChessController{
                     }
                     return target["owner"] != this.#player
                 }
+                if(ChessPieceMoviment.onlyToAttack(moviment["name"])){
+                    return false;
+                }
                 return true;
             }
 
@@ -132,30 +135,7 @@ class ChessController{
             let movimentYToDown = moviment["y"] == -10
             let movimentXToRight = moviment["x"] == 10
             let movimentYToTop = moviment["y"] == 10
-            //TODO: REFORMULAR
-            // if(movimentXToLeft){
-            //     if(movimentYToDown){
-            //         //TODO:
-            //     }else if(movimentYToTop){
-            //         //TODO:
-            //     }else{
-            //         //TODO:
-            //     }
-            // }else if(movimentXToRight){
-            //     if(movimentYToDown){
-            //         //TODO:
-            //     }else if(movimentYToTop){
-            //         //TODO:
-            //     }else{
-            //         //TODO:
-            //     }
-            // }else{
-            //     if(movimentYToDown){
-            //         //TODO:
-            //     }else if(movimentYToTop){
-            //         //TODO:
-            //     }
-            // }
+            
 
             return false;
         }
@@ -189,6 +169,11 @@ class ChessController{
             }
             return target["owner"] != this.#player
         }
+
+        if(ChessPieceMoviment.onlyToAttack(moviment["name"])){
+            return false;
+        }
+
         return true;
     }
 
@@ -209,7 +194,6 @@ class ChessController{
     #onConnection(player, is_player){
         this.#player = player
         this.#isPlayer = is_player;
-        this.#callbackOnConnection(is_player)
     }
     #onPlayerJoinOrQuit(hasJoined){
         this.#allPlayersConnected = hasJoined
@@ -218,6 +202,7 @@ class ChessController{
         this.#piecesController.createPiece(piece_id, piece_type, piece_position, owner)
     }
     #onUpdateChessPiecePosition(chessPieceId, position){
+        console.log(chessPieceId, position)
         this.#piecesController.updatePiecePosition(chessPieceId, position)
     }
     #onDestroyChessPiece(chessPieceId){

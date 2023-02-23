@@ -1,4 +1,5 @@
 class ChessApi{
+    #onReceivePacket
     #socket
     #listeners = {
         "connection": [],
@@ -11,7 +12,8 @@ class ChessApi{
         "playerWin": []
     }
 
-    constructor(address, onOpen = (_event) => {}, onClose = (_event) => {}){
+    constructor(address, onOpen, onClose, onReceivePacket){
+        this.#onReceivePacket = onReceivePacket
         this.#socket = new WebSocket(address)
         this.#socket.onopen = onOpen
         this.#socket.onclose = onClose
@@ -77,7 +79,7 @@ class ChessApi{
                     }
                     break;  
                 case ChessEventType.EVENTS_TYPES.updateChessPiecePosition:
-                    const chessPieceId = 1
+                    const chessPieceId = data["chess_piece_id"];
                     const position = data["chess_piece_position"]
                     if(chessPieceId && position){
                         this.#listeners.updateChessPiecePosition.forEach((listener) => {
@@ -102,6 +104,7 @@ class ChessApi{
                     }
                     break;
             }
+            this.#onReceivePacket()
             return;
         }
         console.error(`Invalid Data: ${data}`)

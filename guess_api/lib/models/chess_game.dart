@@ -104,7 +104,9 @@ class ChessGame{
       }else{
         movimentY = pieceMoviment.y;
       }
-      int newLocX = piece.x + movimentX, newLocY = piece.y + movimentY;
+
+      int newLocX = piece.x + movimentX,
+        newLocY = piece.y + movimentY;
 
       if(newLocX < 0 || newLocX > 7 || newLocY < 0 || newLocY > 7){
         return null;
@@ -121,7 +123,8 @@ class ChessGame{
         if(pieceMoviment.onlyToAttack()){
           return null;
         }
-        return [ChessPacket.updateChessPiecePosition(chessPieceId, movimentX, movimentY)];
+        piece.updatePosition(newLocX, newLocY);
+        return [ChessPacket.updateChessPiecePosition(piece.id, newLocX, newLocY)];
       }
       
       if(target.owner == player){
@@ -132,8 +135,10 @@ class ChessGame{
         return null;
       }
 
+      piece.destroy();
+      piece.updatePosition(newLocX, newLocY);
       return [ChessPacket.destroyChessPiece(target.id),
-        ChessPacket.updateChessPiecePosition(chessPieceId, movimentX, movimentY)];
+        ChessPacket.updateChessPiecePosition(chessPieceId, newLocX, newLocY)];
     }
     return null;
   }
