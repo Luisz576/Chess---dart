@@ -154,6 +154,11 @@ class ChessPieceMoviment{
                 "y": 1,
                 "id": 0
             },
+            "pawn_down": {
+                "x": 0,
+                "y": 1,
+                "id": 0
+            },
             "pawn_attack_right": {
                 "x": 1,
                 "y": 1,
@@ -165,6 +170,24 @@ class ChessPieceMoviment{
                 "id": 2
             }
         }
+    }
+
+    static thisPlayerCanDo(movimentName, player){
+        if(player == 1){
+            if(movimentName == "pawn_top"){
+                return false;
+            }
+        }else{
+            if(movimentName == "pawn_down"){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    static onlyToMove(movimentName){
+        return movimentName == "pawn_top"
+            || movimentName == "pawn_down"
     }
 
     static onlyToAttack(movimentName){

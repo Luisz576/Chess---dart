@@ -1,9 +1,14 @@
+import 'dart:io';
+
 import 'package:guess_api/domain/chess_piece_moviment.dart';
 import 'package:guess_api/domain/chess_piece_type.dart';
 import 'package:guess_api/models/chess_packet.dart';
 import 'package:guess_api/models/chess_piece.dart';
 
 class ChessGame{
+  WebSocket? p1, p2;
+  int currentPlayer = 1;
+
   final List<ChessPiece> _pieces = [];
 
   ChessGame(){

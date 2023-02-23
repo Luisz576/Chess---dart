@@ -1,13 +1,13 @@
 class ChessController{
     #tableResolution
     #chessCanvas
-    #canvas
+    #render
+    #piecesController
     #api
     #callbackOnConnection
     #player = -1
     #allPlayersConnected = false
     #isPlayer = false
-    #pieces = {}
     #whoisNow = 1
 
     isMe(){
@@ -20,12 +20,13 @@ class ChessController{
 
     constructor(canvas, api, tableResolution, callbackOnConnection){
         this.#chessCanvas = canvas
-        this.#canvas = canvas.getContext('2d')
+        
         this.#tableResolution = tableResolution
-        this.#chessCanvas.width = tableResolution * 8
-        this.#chessCanvas.height = tableResolution * 8
         this.#api = api
         this.#callbackOnConnection = callbackOnConnection
+
+        this.#piecesController = new ChessPiecesController()
+        this.#render = new ChessRender(canvas, tableResolution)
 
         canvas.addEventListener("click", this.#clickHandler.bind(this))
 
@@ -40,7 +41,7 @@ class ChessController{
     }
 
     #clickHandler(event){
-        if(this.#allPlayersConnected && this.#whoisNow == this.#player){
+        if(this.#allPlayersConnected && this.isMe()){
             const canvasBounding = this.#chessCanvas.getBoundingClientRect()
             const clickPosition = {
                 "x": Math.ceil((event.clientX - canvasBounding.left) / this.#tableResolution) - 1,
@@ -53,7 +54,7 @@ class ChessController{
     #selectedPiece
 
     #onPlayerClick(clickPosition){
-        let cliquedPiece = this.#getPieceAt(clickPosition["x"], clickPosition["y"]);
+        let cliquedPiece = this.#piecesController.getPieceAt(clickPosition["x"], clickPosition["y"]);
         if(cliquedPiece){
             if(cliquedPiece["owner"] == this.#player){
                 this.#selectedPiece = cliquedPiece
@@ -74,8 +75,10 @@ class ChessController{
             for(let k in moviments){
                 //moviment logic
                 let moviment = moviments[k]
+                moviment["name"] = k
                 if(this.#canDoThisMoviment(this.#selectedPiece, moviment, distance)){
                     this.#sendMovimentPacket(this.#selectedPiece["piece_id"], moviment["id"], 1)
+                    this.#clearPossibleMoviments()
                     break;
                 }
             }
@@ -94,6 +97,7 @@ class ChessController{
 
         for(let k in moviments){
             let moviment = moviments[k]
+            moviment["name"] = k
             if(this.#canDoThisMoviment(selectedPiece, moviment)){
                 this.#addPossibleMoviment(selectedPiece["piece_position"], moviment)
             }
@@ -101,6 +105,10 @@ class ChessController{
     }
 
     #canDoThisMoviment(selectedPiece, moviment, distance = -1){
+        if(!ChessPieceMoviment.thisPlayerCanDo(moviment["name"], this.#player)){
+            return false;
+        }
+
         let startX = selectedPiece["piece_position"]["x"];
         let startY = selectedPiece["piece_position"]["y"];
         if(distance == -1){
@@ -108,8 +116,11 @@ class ChessController{
                 && moviment["y"] != 10 && moviment["y"] != -10){
                 let endX = startX + moviment["x"]
                 let endY = startY + moviment["y"]
-                let target = this.#getPieceAt(endX, endY)
+                let target = this.#piecesController.getPieceAt(endX, endY)
                 if(target != null){
+                    if(ChessPieceMoviment.onlyToMove(moviment["name"])){
+                        return false;
+                    }
                     return target["owner"] != this.#player
                 }
                 return true;
@@ -165,27 +176,20 @@ class ChessController{
         let toX = startX > endX ? startX : endX
         for(let y = startY > endY ? endY : startY; y < toY; y++){
             for(let x = startX > endX ? endX : startX; x < toX; x++){
-                if(_getPieceAt(x, y) != null){
+                if(this.#piecesController.getPieceAt(x, y) != null){
                     return false;
                 }
             }
         }
 
-        let target = _getPieceAt(toX, toY)
+        let target = this.#piecesController.getPieceAt(toX, toY)
         if(target != null){
+            if(ChessPieceMoviment.onlyToMove(moviment["name"])){
+                return false;
+            }
             return target["owner"] != this.#player
         }
         return true;
-    }
-
-    #getPieceAt(x, y){
-        for(let k in this.#pieces){
-            let piece_position = this.#pieces[k]["piece_position"]
-            if(piece_position["x"] == x && piece_position["y"] == y){
-                return this.#pieces[k]
-            }
-        }
-        return undefined;
     }
 
     #clearPossibleMoviments(){
@@ -211,28 +215,16 @@ class ChessController{
         this.#allPlayersConnected = hasJoined
     }
     #onPieceCreate(piece_id, piece_type, piece_position, owner){
-        this.#pieces[piece_id] = {
-            "piece_id": piece_id,
-            "piece_type": CHESS_PIECE_TYPES.fromValue(piece_type),
-            "piece_position": {
-                "x": piece_position[0],
-                "y": piece_position[1]
-            },
-            "owner": owner
-        }
+        this.#piecesController.createPiece(piece_id, piece_type, piece_position, owner)
     }
     #onUpdateChessPiecePosition(chessPieceId, position){
-        if(this.#pieces[chessPieceId]){
-            this.#pieces[chessPieceId]["piece_position"] = position
-        }
+        this.#piecesController.updatePiecePosition(chessPieceId, position)
     }
     #onDestroyChessPiece(chessPieceId){
-        delete this.#pieces[chessPieceId]
+        this.#piecesController.destroyPiece(chessPieceId)
     }
     #onChangeChessPieceType(chessPieceId, type){
-        if(this.#pieces[chessPieceId]){
-            this.#pieces[chessPieceId]["piece_type"] = type
-        }
+        this.#piecesController.changePieceType(chessPieceId, type)
     }
     #onChangePlayerTime(playerTime){
         this.#whoisNow = playerTime
@@ -242,37 +234,6 @@ class ChessController{
     }
 
     renderTable(){
-        this.#canvas.clearRect(0, 0, this.#chessCanvas.width, this.#chessCanvas.height)
-        for(let y = 0; y < 8; y++){
-            for(let x = 0; x < 8; x++){
-                this._drawRect(x * this.#tableResolution,
-                    y * this.#tableResolution,
-                    this.#tableResolution,
-                    this.#tableResolution,
-                    (y * 7 + x) % 2 == 0 ? "black" : "white")
-            }
-        }
-        for(let i in this.#pieces){
-            let piece = this.#pieces[i]
-            let position = piece["piece_position"]
-            this._drawRect(position['x'] * this.#tableResolution,
-                position['y'] * this.#tableResolution,
-                this.#tableResolution,
-                this.#tableResolution,
-                piece["owner"] == 1 ? "red" : "blue")
-        }
-        if(this.#whoisNow == this.#player){
-            for(let i in this.#possibleMoviments){
-                this._drawRect(this.#possibleMoviments[i]['x'] * this.#tableResolution,
-                this.#possibleMoviments[i]['y'] * this.#tableResolution,
-                this.#tableResolution,
-                this.#tableResolution,
-                "green")
-            }
-        }
-    }
-    _drawRect(x, y, width, height, color){
-        this.#canvas.fillStyle = color;
-        this.#canvas.fillRect(x, y, width, height)
+        this.#render.render(this.#piecesController.getAllPieces(), this.#possibleMoviments, this.isMe())
     }
 }
