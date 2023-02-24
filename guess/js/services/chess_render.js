@@ -49,7 +49,7 @@ class ChessRender{
                         py * this.#tableResolution,
                         this.#tableResolution,
                         this.#tableResolution,
-                    "green")
+                    "rgba(10, 100, 175, 0.4)")
                 }
             }
         }

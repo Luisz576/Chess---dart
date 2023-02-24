@@ -78,7 +78,6 @@ class ChessController{
                 //moviment logic
                 let moviment = moviments[k]
                 moviment["name"] = k
-                console.log(moviment, ":", distance)
                 if(this.#canDoThisMoviment(this.#selectedPiece, moviment, distance)){
                     let maxDist = this.#whatsMaxDistance(
                             this.#selectedPiece["piece_position"],
@@ -101,7 +100,6 @@ class ChessController{
     }
 
     #sendMovimentPacket(chessPieceId, moviment, value){
-        console.log("Send: ", chessPieceId, moviment, value)
         this.#api.moveChessPiece(chessPieceId, moviment, value)
     }
 
@@ -164,7 +162,6 @@ class ChessController{
         if(!ChessPieceMoviment.thisPlayerCanDo(moviment["name"], this.#player)){
             return false;
         }
-
         let startX = selectedPiece["piece_position"]["x"];
         let startY = selectedPiece["piece_position"]["y"];
         if(distance == -1){
@@ -178,7 +175,7 @@ class ChessController{
                         return false;
                     }
                     return target["owner"] != this.#player
-                }
+                    }
                 if(ChessPieceMoviment.onlyToAttack(moviment["name"])){
                     return false;
                 }
@@ -284,9 +281,12 @@ class ChessController{
         this.#whoisNow = playerTime
     }
     #onPlayerWin(player){
-        // this.#chessModal
-        // this.#chessModalMessage
-        //TODO: show modal and listener to close modal
+        this.#chessModal.classList.add('modal-visible')
+        this.#chessModalMessage.innerText = `Player ${player} venceu!`
+        const cm = this.#chessModal
+        setTimeout(() => {
+            cm.classList.remove('modal-visible')
+        }, 10000)
     }
 
     renderTable(){

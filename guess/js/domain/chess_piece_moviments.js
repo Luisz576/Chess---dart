@@ -159,17 +159,26 @@ class ChessPieceMoviment{
                 "y": -1,
                 "id": 1
             },
-            "pawn_attack_right": {
+            "pawn_attack_right_top": {
                 "x": 1,
                 "y": 1,
                 "id": 2
             },
-            "pawn_attack_left": {
+            "pawn_attack_left_top": {
                 "x": -1,
                 "y": 1,
                 "id": 3
             },
-            //TODO: ataque para cima + add na função de se player pode fazer movimento
+            "pawn_attack_right_down": {
+                "x": 1,
+                "y": -1,
+                "id": 4
+            },
+            "pawn_attack_left_down": {
+                "x": -1,
+                "y": -1,
+                "id": 5
+            },
         },
         "bishop": {
             "top_left": {
@@ -197,11 +206,15 @@ class ChessPieceMoviment{
 
     static thisPlayerCanDo(movimentName, player){
         if(player == 1){
-            if(movimentName == "pawn_down"){
+            if(movimentName == "pawn_down"
+                || movimentName == "pawn_attack_right_down"
+                || movimentName == "pawn_attack_left_down"){
                 return false;
             }
         }else{
-            if(movimentName == "pawn_top"){
+            if(movimentName == "pawn_top"
+                || movimentName == "pawn_attack_right_top"
+                || movimentName == "pawn_attack_left_top"){
                 return false;
             }
         }
@@ -214,8 +227,10 @@ class ChessPieceMoviment{
     }
 
     static onlyToAttack(movimentName){
-        return movimentName == "pawn_attack_right"
-            || movimentName == "pawn_attack_left"
+        return movimentName == "pawn_attack_right_top"
+            || movimentName == "pawn_attack_left_top"
+            || movimentName == "pawn_attack_right_down"
+            || movimentName == "pawn_attack_left_down"
     }
 
     static getAllowedMoviments(type, distance){

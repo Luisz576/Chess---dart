@@ -32,8 +32,10 @@ enum ChessPieceMoviment{
   knightDownRightRight("knight_7", 2, -1),
   pawnTop("pawn_0", 0, 1),
   pawnDown("pawn_1", 0, -1),
-  pawnAttackRight("pawn_2", 1, 1),
-  pawnAttackLeft("pawn_3", -1, 1),
+  pawnAttackRightTop("pawn_2", 1, 1),
+  pawnAttackLeftTop("pawn_3", -1, 1),
+  pawnAttackRightDown("pawn_4", 1, -1),
+  pawnAttackLeftDown("pawn_5", -1, -1),
   bishopTopLeft("bishop_0", -10, 10),
   bishopTopRight("bishop_1", 10, 10),
   bishopDownLeft("bishop_2", -10, -10),
@@ -65,8 +67,10 @@ enum ChessPieceMoviment{
   }
 
   bool onlyToAttack(){
-    return this == pawnAttackRight
-        || this == pawnAttackLeft;
+    return this == pawnAttackRightTop
+        || this == pawnAttackLeftTop
+        || this == pawnAttackRightDown
+        || this == pawnAttackLeftDown;
   }
 
   bool onlyToMove(){
@@ -74,11 +78,15 @@ enum ChessPieceMoviment{
   }
 
   bool onlyIfPlayer1(){
-    return this == pawnTop;
+    return this == pawnTop
+      || this == pawnAttackLeftTop
+      || this == pawnAttackRightTop;
   }
 
   bool onlyIfPlayer2(){
-    return this == pawnDown;
+    return this == pawnDown
+      || this == pawnAttackLeftDown
+      || this == pawnAttackRightDown;
   }
 
   static ChessPieceMoviment fromData(ChessPieceType chessPieceType, int moviment){
