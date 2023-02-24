@@ -58,3 +58,21 @@ body{
 #chess-canvas{
     border: 1px solid tomato
 }
+/* MODAL */
+.modal{
+    display: none;
+    background-color: rgba(0, 0, 0, 0.4);
+    position: fixed;
+    width: 100vw;
+    height: 100vh;
+    z-index: 100;
+}
+.modal-visible{
+    display: grid;
+    justify-content: center;
+    align-content: center;
+}
+.modal-box{
+    background-color: #fdfdfd;
+    padding: 20px 40px;
+}

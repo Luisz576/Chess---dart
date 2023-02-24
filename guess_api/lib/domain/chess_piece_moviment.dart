@@ -28,7 +28,7 @@ enum ChessPieceMoviment{
   knightTopRightRight("knight_3", 2, 1),
   knightDownDownLeft("knight_4", -1, -2),
   knightDownDownRight("knight_5", 1, -2),
-  knightDownLeftLeft("knight_6", -2, 1),
+  knightDownLeftLeft("knight_6", -2, -1),
   knightDownRightRight("knight_7", 2, -1),
   pawnTop("pawn_0", 0, 1),
   pawnDown("pawn_1", 0, -1),

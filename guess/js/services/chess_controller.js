@@ -1,6 +1,9 @@
 class ChessController{
     #tableResolution
     #chessCanvas
+    #cgm
+    #chessModal
+    #chessModalMessage
     #render
     #piecesController
     #api
@@ -17,8 +20,11 @@ class ChessController{
         return this.#isPlayer
     }
 
-    constructor(canvas, api, tableResolution){
+    constructor(canvas, cgm, chessModal, chessModalMessage, api, tableResolution){
         this.#chessCanvas = canvas
+        this.#cgm = cgm
+        this.#chessModal = chessModal
+        this.#chessModalMessage = chessModalMessage
         
         this.#tableResolution = tableResolution
         this.#api = api
@@ -72,6 +78,7 @@ class ChessController{
                 //moviment logic
                 let moviment = moviments[k]
                 moviment["name"] = k
+                console.log(moviment, ":", distance)
                 if(this.#canDoThisMoviment(this.#selectedPiece, moviment, distance)){
                     let maxDist = this.#whatsMaxDistance(
                             this.#selectedPiece["piece_position"],
@@ -94,6 +101,7 @@ class ChessController{
     }
 
     #sendMovimentPacket(chessPieceId, moviment, value){
+        console.log("Send: ", chessPieceId, moviment, value)
         this.#api.moveChessPiece(chessPieceId, moviment, value)
     }
 
@@ -149,6 +157,7 @@ class ChessController{
 
     //TODO: peão trocar tipo
     //TODO: peão atacar
+    //TODO: rock
     //TODO: peão andar 2 no começo
 
     #canDoThisMoviment(selectedPiece, moviment, distance = -1){
@@ -245,9 +254,19 @@ class ChessController{
     #onConnection(player, is_player){
         this.#player = player
         this.#isPlayer = is_player;
+        if(is_player){
+            this.#cgm.innerText = "Esperando jogador..."
+            return
+        }
+        this.#cgm.innerText = "Espectador"
     }
     #onPlayerJoinOrQuit(hasJoined){
         this.#allPlayersConnected = hasJoined
+        if(this.#isPlayer){
+            this.#cgm.innerText = hasJoined ? ("Conectado: " + this.#player) : "Esperando jogador..."
+            return
+        }
+        this.#cgm.innerText = "Espectador"
     }
     #onPieceCreate(piece_id, piece_type, piece_position, owner){
         this.#piecesController.createPiece(piece_id, piece_type, piece_position, owner)
@@ -265,7 +284,9 @@ class ChessController{
         this.#whoisNow = playerTime
     }
     #onPlayerWin(player){
-        console.log("onPlayerWin:", player)
+        // this.#chessModal
+        // this.#chessModalMessage
+        //TODO: show modal and listener to close modal
     }
 
     renderTable(){

@@ -168,7 +168,8 @@ class ChessPieceMoviment{
                 "x": -1,
                 "y": 1,
                 "id": 3
-            }
+            },
+            //TODO: ataque para cima + add na função de se player pode fazer movimento
         },
         "bishop": {
             "top_left": {

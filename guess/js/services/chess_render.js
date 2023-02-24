@@ -26,15 +26,6 @@ class ChessRender{
                     (y * 7 + x) % 2 == 0 ? "black" : "white")
             }
         }
-        for(let i in pieces){
-            let piece = pieces[i]
-            let position = piece["piece_position"]
-            this.#drawImage(piece["piece_image"],
-                position['x'] * this.#tableResolution,
-                position['y'] * this.#tableResolution,
-                this.#tableResolution,
-                this.#tableResolution)
-        }
         if(isMe){
             for(let i in possibleMoviments){
                 let possibleMoviment = possibleMoviments[i]
@@ -61,6 +52,15 @@ class ChessRender{
                     "green")
                 }
             }
+        }
+        for(let i in pieces){
+            let piece = pieces[i]
+            let position = piece["piece_position"]
+            this.#drawImage(piece["piece_image"],
+                position['x'] * this.#tableResolution,
+                position['y'] * this.#tableResolution,
+                this.#tableResolution,
+                this.#tableResolution)
         }
     }
     #drawRect(x, y, width, height, color){
