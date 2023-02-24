@@ -64,7 +64,7 @@ class ChessApi{
                     const chessPieceIdT = data["chess_piece_id"]
                     const type = data["chess_piece_type"]
                     const owner = data["piece_owner"]
-                    if(chessPieceIdT && type && owner){
+                    if(Number.isInteger(chessPieceIdT) && chessPieceIdT > -1 && type && owner){
                         this.#listeners.changeChessPieceType.forEach((listener) => {
                             listener(chessPieceIdT, type, owner)
                         })
@@ -72,7 +72,7 @@ class ChessApi{
                     break;
                 case ChessEventType.EVENTS_TYPES.destroyChessPiece:
                     const chessPieceIdD = data["chess_piece_id"];
-                    if(chessPieceIdD){
+                    if(Number.isInteger(chessPieceIdD) && chessPieceIdD > -1){
                         this.#listeners.destroyChessPiece.forEach((listener) => {
                             listener(chessPieceIdD)
                         })
@@ -81,7 +81,7 @@ class ChessApi{
                 case ChessEventType.EVENTS_TYPES.updateChessPiecePosition:
                     const chessPieceId = data["chess_piece_id"];
                     const position = data["chess_piece_position"]
-                    if(chessPieceId && position){
+                    if(Number.isInteger(chessPieceId) && chessPieceId > -1 && position){
                         this.#listeners.updateChessPiecePosition.forEach((listener) => {
                             listener(chessPieceId, position)
                         })
@@ -128,7 +128,7 @@ class ChessApi{
 
     // ACTIONS
     moveChessPiece(chessPieceId, moviment, value){
-        if(chessPieceId && Number.isInteger(moviment)){
+        if(Number.isInteger(chessPieceId) && chessPieceId > -1 && Number.isInteger(moviment)){
             this.#sendJson({
                 "type": "clientPacket",
                 "chessPieceId": chessPieceId,

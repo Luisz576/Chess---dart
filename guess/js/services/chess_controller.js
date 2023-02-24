@@ -60,8 +60,6 @@ class ChessController{
                 this.renderTable()
                 return;
             }
-            //TODO: attack?
-            return
         }
         if(this.#selectedPiece){
             let selectedPiecePosition = this.#selectedPiece["piece_position"]
@@ -69,14 +67,23 @@ class ChessController{
                 "x": clickPosition["x"] - selectedPiecePosition["x"],
                 "y": clickPosition["y"] - selectedPiecePosition["y"]
             }
-            let moviments = ChessPieceMoviment.CHESS_PIECE_MOVIMENTS[this.#selectedPiece["piece_type"]]
-            //TODO: peao primeiro movimento 2 casas
+            let moviments = ChessPieceMoviment.getAllowedMoviments(this.#selectedPiece["piece_type"], distance)
             for(let k in moviments){
                 //moviment logic
                 let moviment = moviments[k]
                 moviment["name"] = k
                 if(this.#canDoThisMoviment(this.#selectedPiece, moviment, distance)){
-                    this.#sendMovimentPacket(this.#selectedPiece["piece_id"], moviment["id"], 1)
+                    let maxDist = this.#whatsMaxDistance(
+                            this.#selectedPiece["piece_position"],
+                            moviment["x"] == 10 ? 1 : moviment["x"] == -10 ? -1 : 0,
+                            moviment["y"] == 10 ? 1 : moviment["y"] == -10 ? -1 : 0,
+                            this.#selectedPiece["owner"]
+                        )
+                    let dist = distance["y"] == 0 || (distance["y"] > distance["x"] && distance["x"] != 0) ? distance["x"] : distance["y"]
+                    dist = dist < 0 ? -1 * dist : dist
+                    this.#sendMovimentPacket(this.#selectedPiece["piece_id"], moviment["id"],
+                        Math.min(maxDist, dist)
+                    )
                     this.#clearPossibleMoviments()
                     this.renderTable()
                     break;
@@ -99,10 +106,50 @@ class ChessController{
             let moviment = moviments[k]
             moviment["name"] = k
             if(this.#canDoThisMoviment(selectedPiece, moviment)){
-                this.#addPossibleMoviment(selectedPiece["piece_position"], moviment)
+                let maxD = this.#whatsMaxDistance(selectedPiece["piece_position"],
+                    moviment["x"] == 10 ? 1 : moviment["x"] == -10 ? -1 : 0,
+                    moviment["y"] == 10 ? 1 : moviment["y"] == -10 ? -1 : 0,
+                    selectedPiece["owner"]
+                )
+                this.#addPossibleMoviment(selectedPiece["piece_position"], moviment, Math.max(maxD, 1))
             }
         }
     }
+
+    #whatsMaxDistance(position, goingToX = 0, goingToY = 0, owner){
+        let power = 0;
+        while(power < 7){
+            let destinyX = position["x"]
+            let destinyY = position["y"]
+            if(goingToX != 0){
+                destinyX = position["x"] + (goingToX * (power + 1))
+                if(destinyX > 7 || destinyX < 0){
+                    break
+                }
+            }
+            if(goingToY != 0){
+                destinyY = position["y"] + (goingToY * (power + 1))
+                if(destinyY > 7 || destinyY < 0){
+                    break
+                }
+            }
+            let target = this.#piecesController.getPieceAt(destinyX, destinyY)
+            if(target == null){
+                power++
+                continue
+            }
+            if(target["owner"] == owner){
+                break
+            }
+            power++
+            break
+        }
+        return power;
+    }
+
+    //TODO: peão trocar tipo
+    //TODO: peão atacar
+    //TODO: peão andar 2 no começo
 
     #canDoThisMoviment(selectedPiece, moviment, distance = -1){
         if(!ChessPieceMoviment.thisPlayerCanDo(moviment["name"], this.#player)){
@@ -112,10 +159,10 @@ class ChessController{
         let startX = selectedPiece["piece_position"]["x"];
         let startY = selectedPiece["piece_position"]["y"];
         if(distance == -1){
+            let endX = startX + moviment["x"]
+            let endY = startY + moviment["y"]
             if(moviment["x"] != 10 && moviment["x"] != -10
                 && moviment["y"] != 10 && moviment["y"] != -10){
-                let endX = startX + moviment["x"]
-                let endY = startY + moviment["y"]
                 let target = this.#piecesController.getPieceAt(endX, endY)
                 if(target != null){
                     if(ChessPieceMoviment.onlyToMove(moviment["name"])){
@@ -129,15 +176,15 @@ class ChessController{
                 return true;
             }
 
-            let endX = -1;
-            let endY = -1;
-            let movimentXToLeft = moviment["x"] == -10
-            let movimentYToDown = moviment["y"] == -10
-            let movimentXToRight = moviment["x"] == 10
-            let movimentYToTop = moviment["y"] == 10
-            
+            let maxDist = this.#whatsMaxDistance(selectedPiece["piece_position"],
+                moviment["x"] == 10 ? 1 : moviment["x"] == -10 ? -1 : 0,
+                moviment["y"] == 10 ? 1 : moviment["y"] == -10 ? -1 : 0,
+                selectedPiece["owner"])
+            if(maxDist == 0){
+                return false
+            }
 
-            return false;
+            return true
         }
 
         let endX = startX + distance["x"]
@@ -148,30 +195,26 @@ class ChessController{
         }
 
         if(moviment["x"] != 10 && moviment["x"] != -10
-            && moviment["y"] != 10 && moviment["y"] != -10){
-            return moviment["x"] == distance["x"] && moviment["y"] == distance["y"]
-        }
-
-        let toY = startY > endY ? startY : endY
-        let toX = startX > endX ? startX : endX
-        for(let y = startY > endY ? endY : startY; y < toY; y++){
-            for(let x = startX > endX ? endX : startX; x < toX; x++){
-                if(this.#piecesController.getPieceAt(x, y) != null){
+                && moviment["y"] != 10 && moviment["y"] != -10){
+            let target = this.#piecesController.getPieceAt(endX, endY)
+            if(target != null){
+                if(ChessPieceMoviment.onlyToMove(moviment["name"])){
                     return false;
                 }
+                return target["owner"] != this.#player
             }
-        }
-
-        let target = this.#piecesController.getPieceAt(toX, toY)
-        if(target != null){
-            if(ChessPieceMoviment.onlyToMove(moviment["name"])){
+            if(ChessPieceMoviment.onlyToAttack(moviment["name"])){
                 return false;
             }
-            return target["owner"] != this.#player
+            return true;
         }
 
-        if(ChessPieceMoviment.onlyToAttack(moviment["name"])){
-            return false;
+        let maxDist = this.#whatsMaxDistance(selectedPiece["piece_position"],
+                moviment["x"] == 10 ? 1 : moviment["x"] == -10 ? -1 : 0,
+                moviment["y"] == 10 ? 1 : moviment["y"] == -10 ? -1 : 0,
+                selectedPiece["owner"])
+        if(maxDist == 0){
+            return false
         }
 
         return true;
@@ -183,11 +226,19 @@ class ChessController{
         }
     }
 
-    #addPossibleMoviment(currentPosition, moviment){
+    #addPossibleMoviment(currentPosition, moviment, power = 1){
         this.#possibleMoviments.push({
             "id": moviment["id"],
-            "x": currentPosition["x"] + moviment["x"],
-            "y": currentPosition["y"] + moviment["y"]
+            "current_position": currentPosition,
+            "base_moviment": {
+                "x": moviment["x"],
+                "y": moviment["y"]
+            },
+            "newPosition": {
+                "x": currentPosition["x"] + moviment["x"],
+                "y": currentPosition["y"] + moviment["y"]
+            },
+            "power": power,
         })
     }
 
@@ -202,7 +253,6 @@ class ChessController{
         this.#piecesController.createPiece(piece_id, piece_type, piece_position, owner)
     }
     #onUpdateChessPiecePosition(chessPieceId, position){
-        console.log(chessPieceId, position)
         this.#piecesController.updatePiecePosition(chessPieceId, position)
     }
     #onDestroyChessPiece(chessPieceId){

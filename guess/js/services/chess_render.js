@@ -37,11 +37,29 @@ class ChessRender{
         }
         if(isMe){
             for(let i in possibleMoviments){
-                this.#drawRect(possibleMoviments[i]['x'] * this.#tableResolution,
-                    possibleMoviments[i]['y'] * this.#tableResolution,
-                    this.#tableResolution,
-                    this.#tableResolution,
+                let possibleMoviment = possibleMoviments[i]
+                for(let p = 0; p < possibleMoviment["power"]; p++){
+                    let px = possibleMoviment["base_moviment"]['x'], py = possibleMoviment["base_moviment"]['y'];
+                    if(possibleMoviment["base_moviment"]['x'] == 10){
+                        px = p + 1;
+                    }
+                    if(possibleMoviment["base_moviment"]['x'] == -10){
+                        px = (p + 1) * -1;
+                    }
+                    if(possibleMoviment["base_moviment"]['y'] == 10){
+                        py = p + 1;
+                    }
+                    if(possibleMoviment["base_moviment"]['y'] == -10){
+                        py = (p + 1) * -1;
+                    }
+                    px += possibleMoviment["current_position"]["x"]
+                    py += possibleMoviment["current_position"]["y"]
+                    this.#drawRect(px * this.#tableResolution,
+                        py * this.#tableResolution,
+                        this.#tableResolution,
+                        this.#tableResolution,
                     "green")
+                }
             }
         }
     }

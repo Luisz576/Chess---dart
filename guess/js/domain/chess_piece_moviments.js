@@ -4,37 +4,37 @@ class ChessPieceMoviment{
             "right": {
                 "x": 1,
                 "y": 0,
-                "id": 0
+                "id": 1
             },
             "right_top": {
                 "x": 1,
                 "y": 1,
-                "id": 1
+                "id": 2
             },
             "right_down": {
                 "x": 1,
                 "y": -1,
-                "id": 2
+                "id": 3
             },
             "left": {
                 "x": -1,
                 "y": 0,
-                "id": 3
+                "id": 4
             },
             "left_top": {
                 "x": -1,
                 "y": 1,
-                "id": 4
+                "id": 5
             },
             "left_down": {
                 "x": -1,
                 "y": -1,
-                "id": 5
+                "id": 6
             },
             "top": {
                 "x": 0,
                 "y": 1,
-                "id": 6
+                "id": 0
             },
             "down": {
                 "x": 0,
@@ -46,37 +46,37 @@ class ChessPieceMoviment{
             "right": {
                 "x": 10,
                 "y": 0,
-                "id": 0
+                "id": 1
             },
             "right_top": {
                 "x": 10,
                 "y": 10,
-                "id": 1
+                "id": 2
             },
             "right_down": {
                 "x": 10,
                 "y": -10,
-                "id": 2
+                "id": 3
             },
             "left": {
                 "x": -10,
                 "y": 0,
-                "id": 3
+                "id": 4
             },
             "left_top": {
                 "x": -10,
                 "y": 10,
-                "id": 4
+                "id": 5
             },
             "left_down": {
                 "x": -10,
                 "y": -10,
-                "id": 5
+                "id": 6
             },
             "top": {
                 "x": 0,
                 "y": 10,
-                "id": 6
+                "id": 0
             },
             "down": {
                 "x": 0,
@@ -156,29 +156,51 @@ class ChessPieceMoviment{
             },
             "pawn_down": {
                 "x": 0,
-                "y": 1,
-                "id": 0
+                "y": -1,
+                "id": 1
             },
             "pawn_attack_right": {
                 "x": 1,
                 "y": 1,
-                "id": 1
+                "id": 2
             },
             "pawn_attack_left": {
                 "x": -1,
                 "y": 1,
-                "id": 2
+                "id": 3
             }
+        },
+        "bishop": {
+            "top_left": {
+                "x": -10,
+                "y": 10,
+                "id": 0
+            },
+            "top_right": {
+                "x": 10,
+                "y": 10,
+                "id": 1
+            },
+            "down_left": {
+                "x": -10,
+                "y": -10,
+                "id": 2
+            },
+            "down_right": {
+                "x": 10,
+                "y": -10,
+                "id": 3
+            },
         }
     }
 
     static thisPlayerCanDo(movimentName, player){
         if(player == 1){
-            if(movimentName == "pawn_top"){
+            if(movimentName == "pawn_down"){
                 return false;
             }
         }else{
-            if(movimentName == "pawn_down"){
+            if(movimentName == "pawn_top"){
                 return false;
             }
         }
@@ -193,5 +215,25 @@ class ChessPieceMoviment{
     static onlyToAttack(movimentName){
         return movimentName == "pawn_attack_right"
             || movimentName == "pawn_attack_left"
+    }
+
+    static getAllowedMoviments(type, distance){
+        let ms = []
+        let moviments = this.CHESS_PIECE_MOVIMENTS[type]
+        for(let k in moviments){
+            let moviment = moviments[k]
+            if((moviment["x"] == distance["x"] && moviment["y"] == distance["y"])
+                || (moviment["x"] == 10 && distance["x"] > 0 && moviment["y"] == distance["y"])
+                || (moviment["x"] == -10 && distance["x"] < 0 && moviment["y"] == distance["y"])
+                || (moviment["y"] == 10 && distance["y"] > 0 && moviment["x"] == distance["x"])
+                || (moviment["y"] == -10 && distance["y"] < 0 && moviment["x"] == distance["x"])
+                || (moviment["x"] == 10 && distance["x"] > 0 && moviment["y"] == 10 && distance["y"] > 0)
+                || (moviment["x"] == 10 && distance["x"] > 0 && moviment["y"] == -10 && distance["y"] < 0)
+                || (moviment["x"] == -10 && distance["x"] < 0 && moviment["y"] == 10 && distance["y"] > 0)
+                || (moviment["x"] == -10 && distance["x"] < 0 && moviment["y"] == -10 && distance["y"] < 0)){
+                ms.push(moviment)
+            }
+        }
+        return ms
     }
 }

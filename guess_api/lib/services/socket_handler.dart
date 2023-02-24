@@ -56,13 +56,18 @@ class SocketHandler{
           print(e);
           return;
         }
+        if(_game.hasWinner){
+          return;
+        }
         List<ChessPacket>? packets = _game.moveChessPieceHandler(p, clientPacket.chessPieceId, clientPacket.movimentId, clientPacket.value);
         if(packets == null){
           return;
         }
         _broadcastAll(packets);
         if(packets[packets.length - 1].dataType == ChessPacketType.playerWin){
-          //TODO: delay to reload
+          Future.delayed(Duration(seconds: 10), (){
+            _broadcastAll(_game.reset());
+          });
           return;
         }
         _game.currentPlayer = _game.currentPlayer == 1 ? 2 : 1;

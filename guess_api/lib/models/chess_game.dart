@@ -9,6 +9,9 @@ class ChessGame{
   WebSocket? p1, p2;
   int currentPlayer = 1;
 
+  bool _hasWinner = false;
+  bool get hasWinner => _hasWinner;
+
   final List<ChessPiece> _pieces = [];
 
   ChessGame(){
@@ -58,12 +61,18 @@ class ChessGame{
   List<ChessPacket> getAllChessGamePackets(){
     List<ChessPacket> packets = [];
     for(int i = 0; i < _pieces.length; i++){
+      if(_pieces[i].destroyed){
+        continue;
+      }
       packets.add(ChessPacket.chessPieceCreate(_pieces[i]));
     }
+    packets.add(ChessPacket.playerTime(this.currentPlayer));
     return packets;
   }
 
   List<ChessPacket> reset(){
+    _hasWinner = false;
+    currentPlayer = 1;
     List<ChessPacket> packets = [];
     for(int i = 0; i < _pieces.length; i++){
       if(_pieces[i].destroyed){
@@ -71,13 +80,18 @@ class ChessGame{
       }
       packets.add(ChessPacket.destroyChessPiece(i));
     }
+    _pieces.clear();
     packets.addAll(_start());
+    packets.add(ChessPacket.playerTime(currentPlayer));
     return packets;
   }
 
   ChessPiece? _getPieceAt(int x, int y){
     for(ChessPiece piece in _pieces){
       if(piece.x == x && piece.y == y){
+        if(piece.destroyed){
+          continue;
+        }
         return piece;
       }
     }
@@ -87,7 +101,16 @@ class ChessGame{
   List<ChessPacket>? moveChessPieceHandler(int player, int chessPieceId, int moviment, int value){
     if(chessPieceId > -1 && chessPieceId < _pieces.length && _pieces[chessPieceId].owner == player){
       ChessPiece piece = _pieces[chessPieceId];
+
+      if(piece.destroyed){
+        return null;
+      }
+
       ChessPieceMoviment pieceMoviment = piece.getMoviment(moviment);
+      
+      if(pieceMoviment == ChessPieceMoviment.none){
+        return null;
+      }
 
       if((pieceMoviment.onlyIfPlayer1() && player == 2) || (pieceMoviment.onlyIfPlayer2() && player == 1)){
         return null;
@@ -95,12 +118,12 @@ class ChessGame{
 
       int movimentX = 0, movimentY = 0;
       if(pieceMoviment.isXIlimited){
-        movimentX = value;
+        movimentX = value * pieceMoviment.ilimitedSignX;
       }else{
         movimentX = pieceMoviment.x;
       }
       if(pieceMoviment.isYIlimited){
-        movimentY = value;
+        movimentY = value * pieceMoviment.ilimitedSignY;
       }else{
         movimentY = pieceMoviment.y;
       }
@@ -135,8 +158,14 @@ class ChessGame{
         return null;
       }
 
-      piece.destroy();
+      target.destroy();
       piece.updatePosition(newLocX, newLocY);
+      if(target.chessPieceType == ChessPieceType.king){
+        _hasWinner = true;
+        return [ChessPacket.destroyChessPiece(target.id),
+          ChessPacket.updateChessPiecePosition(chessPieceId, newLocX, newLocY),
+          ChessPacket.playerWin(player)];
+      }
       return [ChessPacket.destroyChessPiece(target.id),
         ChessPacket.updateChessPiecePosition(chessPieceId, newLocX, newLocY)];
     }
@@ -144,8 +173,8 @@ class ChessGame{
   }
 
   bool _hasPieceInWay(int startX, int startY, int endX, int endY){
-    int toX = startX > endX ? startX : endX,
-      toY = startY > endY ? startY : endY;
+    int toX = startX < endX ? startX : endX,
+      toY = startY < endY ? startY : endY;
     for(int y = startY > endY ? endY : startY; y < toY; y++){
       for(int x = startX > endX ? endX : startX; x < toX; x++){
         if(_getPieceAt(x, y) != null){
