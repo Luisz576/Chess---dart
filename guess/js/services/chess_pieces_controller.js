@@ -23,14 +23,15 @@ class ChessPiecesController{
     }
 
     updatePiecePosition(piece_id, position){
-        if(this.containsPiece(piece_id)){
+        if(this.#pieces[piece_id]){
             this.#pieces[piece_id]["piece_position"] = position
         }
     }
 
     changePieceType(piece_id, type){
-        if(this.containsPiece(piece_id)){
+        if(this.#pieces[piece_id]){
             this.#pieces[piece_id]["piece_type"] = type
+            this.#pieces[piece_id]["piece_image"] = CHESS_PIECE_TYPES.getImage(type, ["owner"])
         }
     }
 

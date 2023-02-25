@@ -4,7 +4,7 @@ class ChessEventType{
         "playerJoinOrQuit": "playerJoinOrQuit",
         "chessPieceCreate": "chessPieceCreate",
         "updateChessPiecePosition": "updateChessPiecePosition",
-        "changeChessPieceType": "changeChessPieceType",
+        "changeChessPieceType": "changeChessPieceType", 
         "destroyChessPiece": "destroyChessPiece",
         "playerTime": "playerTime",
         "playerWin": "playerWin"

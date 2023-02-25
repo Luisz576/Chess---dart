@@ -4,6 +4,7 @@ class ChessController{
     #cgm
     #chessModal
     #chessModalMessage
+    #chessModalSelectPiece
     #render
     #piecesController
     #api
@@ -20,11 +21,12 @@ class ChessController{
         return this.#isPlayer
     }
 
-    constructor(canvas, cgm, chessModal, chessModalMessage, api, tableResolution){
+    constructor(canvas, cgm, chessModal, chessModalMessage, chessModalSelectPiece, api, tableResolution){
         this.#chessCanvas = canvas
         this.#cgm = cgm
         this.#chessModal = chessModal
         this.#chessModalMessage = chessModalMessage
+        this.#chessModalSelectPiece = chessModalSelectPiece
         
         this.#tableResolution = tableResolution
         this.#api = api
@@ -153,8 +155,6 @@ class ChessController{
         return power;
     }
 
-    //TODO: peão trocar tipo
-    //TODO: peão atacar
     //TODO: rock
     //TODO: peão andar 2 no começo
 
@@ -275,6 +275,10 @@ class ChessController{
         this.#piecesController.destroyPiece(chessPieceId)
     }
     #onChangeChessPieceType(chessPieceId, type){
+        if(type == "none"){
+            this.#chessModalSelectPiece.classList.add('modal-visible')
+            return
+        }
         this.#piecesController.changePieceType(chessPieceId, type)
     }
     #onChangePlayerTime(playerTime){

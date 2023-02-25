@@ -11,6 +11,10 @@ class ChessGame{
 
   bool _hasWinner = false;
   bool get hasWinner => _hasWinner;
+  int _chessIdToChange = -1;
+  bool get isWaitingPacket{
+    return _chessIdToChange != -1;
+  }
 
   final List<ChessPiece> _pieces = [];
 
@@ -67,6 +71,9 @@ class ChessGame{
       packets.add(ChessPacket.chessPieceCreate(_pieces[i]));
     }
     packets.add(ChessPacket.playerTime(this.currentPlayer));
+    if(isWaitingPacket){
+      packets.add(ChessPacket.changeChessPieceType(_chessIdToChange, ChessPieceType.none, _pieces[_chessIdToChange].owner));
+    }
     return packets;
   }
 
@@ -93,6 +100,24 @@ class ChessGame{
           continue;
         }
         return piece;
+      }
+    }
+    return null;
+  }
+
+  ChessPacket? waitingPacketHandler(WebSocket sender, Map json){
+    if(json.containsKey("piece_type")){
+      ChessPieceType type = ChessPieceType.getChangeType(json['piece_type']);
+      if(type == ChessPieceType.none){
+        return null;
+      }
+      ChessPiece piece = _pieces[_chessIdToChange];
+      if((p1 == sender && piece.owner == 1)
+        || (p2 == sender && piece.owner == 2)){
+        int chessIdToChange = _chessIdToChange;
+        piece.changeType(type);
+        _chessIdToChange = -1;
+        return ChessPacket.changeChessPieceType(chessIdToChange, type, -1);
       }
     }
     return null;
@@ -141,13 +166,23 @@ class ChessGame{
         }
       }
 
+      ChessPacket? changeRequestPacket;
+      if(piece.chessPieceType == ChessPieceType.pawn && (newLocY == 7 || newLocY == 0)){
+        _chessIdToChange = piece.id;
+        changeRequestPacket = ChessPacket.changeChessPieceType(piece.id, ChessPieceType.none, piece.owner);
+      }
+
       ChessPiece? target = _getPieceAt(newLocX, newLocY);
       if(target == null){
         if(pieceMoviment.onlyToAttack()){
           return null;
         }
         piece.updatePosition(newLocX, newLocY);
-        return [ChessPacket.updateChessPiecePosition(piece.id, newLocX, newLocY)];
+        List<ChessPacket> packets = [ChessPacket.updateChessPiecePosition(piece.id, newLocX, newLocY)];
+        if(changeRequestPacket != null){
+          packets.add(changeRequestPacket);
+        }
+        return packets;
       }
       
       if(target.owner == player){
@@ -166,8 +201,11 @@ class ChessGame{
           ChessPacket.updateChessPiecePosition(chessPieceId, newLocX, newLocY),
           ChessPacket.playerWin(player)];
       }
-      return [ChessPacket.destroyChessPiece(target.id),
-        ChessPacket.updateChessPiecePosition(chessPieceId, newLocX, newLocY)];
+      return changeRequestPacket == null ? [ChessPacket.destroyChessPiece(target.id),
+        ChessPacket.updateChessPiecePosition(chessPieceId, newLocX, newLocY)]
+        : [ChessPacket.destroyChessPiece(target.id),
+          ChessPacket.updateChessPiecePosition(chessPieceId, newLocX, newLocY),
+          changeRequestPacket];
     }
     return null;
   }

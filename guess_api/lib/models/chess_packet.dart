@@ -24,10 +24,11 @@ class ChessPacket{
     write("piece_position", piece.xy);
     write("piece_owner", piece.owner);
   }
-  ChessPacket.changeChessPieceType(int chessPieceId, ChessPieceType chessPieceType){
+  ChessPacket.changeChessPieceType(int chessPieceId, ChessPieceType chessPieceType, int owner){
     dataType = ChessPacketType.changeChessPieceType;
     write("chess_piece_id", chessPieceId);
     write("chess_piece_type", chessPieceType.value);
+    write("chess_piece_owner", owner);
   }
   ChessPacket.destroyChessPiece(int chessPieceId){
     dataType = ChessPacketType.destroyChessPiece;
@@ -48,6 +49,10 @@ class ChessPacket{
   ChessPacket.playerWin(int player){
     dataType = ChessPacketType.playerWin;
     write("player_win", player);
+  }
+
+  read(String key){
+    return _data[key];
   }
 
   write(String key, value){

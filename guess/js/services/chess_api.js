@@ -63,10 +63,9 @@ class ChessApi{
                 case ChessEventType.EVENTS_TYPES.changeChessPieceType:
                     const chessPieceIdT = data["chess_piece_id"]
                     const type = data["chess_piece_type"]
-                    const owner = data["piece_owner"]
-                    if(Number.isInteger(chessPieceIdT) && chessPieceIdT > -1 && type && owner){
+                    if(Number.isInteger(chessPieceIdT) && chessPieceIdT > -1 && type){
                         this.#listeners.changeChessPieceType.forEach((listener) => {
-                            listener(chessPieceIdT, type, owner)
+                            listener(chessPieceIdT, type)
                         })
                     }
                     break;
@@ -134,6 +133,14 @@ class ChessApi{
                 "chessPieceId": chessPieceId,
                 "moviment": moviment,
                 "value": value
+            })
+        }
+    }
+    sendChangeTypeSelect(type){
+        if(Number.isInteger(type) && type > -1){
+            this.#sendJson({
+                "type": "clientPacket",
+                "piece_type": type,
             })
         }
     }

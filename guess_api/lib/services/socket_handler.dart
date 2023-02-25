@@ -36,7 +36,7 @@ class SocketHandler{
           _removeClient(socket);
         }
       );
-      socket.sendAll(_game.getAllChessGamePackets());
+      socket.sendAll(_game.getAllChessGamePackets(), _game);
     }catch(e){
       print(e);
     }
@@ -46,6 +46,13 @@ class SocketHandler{
     if(json["type"] == "clientPacket"){
       int p = socket == _game.p1 ? 1 : socket == _game.p2 ? 2 : -1;
       if(p != -1){
+        if(_game.isWaitingPacket){
+          ChessPacket? packet = _game.waitingPacketHandler(socket, json);
+          if(packet != null){
+            _broadcastAll([packet]);
+          }
+          return;
+        }
         if(_game.currentPlayer != p){
           return;
         }
@@ -89,9 +96,9 @@ class SocketHandler{
       _broadcast(ChessPacket.playerJoinOrQuit(true));
     }
     _clients.add(client);
-    client.send(ChessPacket.connection(player));
+    client.send(ChessPacket.connection(player), _game);
     if(_game.p1 != null && _game.p2 != null){
-      client.send(ChessPacket.playerJoinOrQuit(true));
+      client.send(ChessPacket.playerJoinOrQuit(true), _game);
     }
   }
 
@@ -115,7 +122,7 @@ class SocketHandler{
 
   _broadcast(ChessPacket packet){
     for (WebSocket client in _clients) {
-      client.add(packet.toJson());
+      client.send(packet, _game);
     }
   }
 }
