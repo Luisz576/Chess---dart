@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:guess_api/domain/chess_piece_custom_moviment.dart';
 import 'package:guess_api/domain/chess_piece_moviment.dart';
 import 'package:guess_api/domain/chess_piece_type.dart';
 import 'package:guess_api/models/chess_packet.dart';
@@ -145,6 +146,14 @@ class ChessGame{
         if(piece.moved){
           return null;
         }
+      }
+
+      if(pieceMoviment.isCustom){
+        try{
+          ChessPieceCustomMoviment customPieceMoviment = ChessPieceCustomMoviment.upgrade(pieceMoviment);
+          return customPieceMoviment.execMoviment(player, piece, _getPieceAt, _hasPieceInWay);
+        }catch(e){ print(e); }
+        return null;
       }
 
       int movimentX = 0, movimentY = 0;

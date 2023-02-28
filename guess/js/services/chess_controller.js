@@ -116,10 +116,11 @@ class ChessController{
             let moviment = moviments[k]
             moviment["name"] = k
             if(this.#canDoThisMoviment(selectedPiece, moviment)){
-                let maxD = this.#whatsMaxDistance(selectedPiece["piece_position"],
-                    moviment["x"] == 10 ? 1 : moviment["x"] == -10 ? -1 : 0,
-                    moviment["y"] == 10 ? 1 : moviment["y"] == -10 ? -1 : 0,
-                    selectedPiece["owner"]
+                let maxD = moviment["custom"] === true ? 1
+                    : this.#whatsMaxDistance(selectedPiece["piece_position"],
+                        moviment["x"] == 10 ? 1 : moviment["x"] == -10 ? -1 : 0,
+                        moviment["y"] == 10 ? 1 : moviment["y"] == -10 ? -1 : 0,
+                        selectedPiece["owner"]
                 )
                 this.#addPossibleMoviment(selectedPiece["piece_position"], moviment, Math.max(maxD, 1))
             }
@@ -157,8 +158,6 @@ class ChessController{
         return power;
     }
 
-    //TODO: rock
-
     #canDoThisMoviment(selectedPiece, moviment, distance = -1){
         if(!ChessPieceMoviment.thisPlayerCanDo(moviment["name"], this.#player)){
             return false;
@@ -168,6 +167,11 @@ class ChessController{
                 return false;
             }
         }
+
+        if(moviment["custom"] === true){
+            return ChessPieceCustomMoviment.canDoThisMoviment(this.#player, selectedPiece, moviment, this.#piecesController.getPieceAt.bind(this.#piecesController))
+        }
+
         let startX = selectedPiece["piece_position"]["x"];
         let startY = selectedPiece["piece_position"]["y"];
         if(distance == -1){

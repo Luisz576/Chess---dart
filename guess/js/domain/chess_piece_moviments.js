@@ -41,6 +41,14 @@ class ChessPieceMoviment{
                 "y": -1,
                 "id": 7
             },
+            "rock_left": {
+                "custom": true,
+                "id": 8
+            },
+            "rock_right": {
+                "custom": true,
+                "id": 9
+            }
         },
         "queen": {
             "right": {
@@ -233,11 +241,18 @@ class ChessPieceMoviment{
         return true;
     }
 
+    static isCustom(movimentName){
+        return movimentName == "rock_left"
+            || movimentName == "rock_right"
+    }
+
     static onlyToMove(movimentName){
         return movimentName == "pawn_top"
             || movimentName == "pawn_down"
             || movimentName == "pawn_double_top"
             || movimentName == "pawn_double_down"
+            || movimentName == "rock_left"
+            || movimentName == "rock_right"
     }
 
     static onlyToAttack(movimentName){
@@ -250,6 +265,8 @@ class ChessPieceMoviment{
     static onlyIfNotMoved(movimentName){
         return movimentName == "pawn_double_top"
             || movimentName == "pawn_double_down"
+            || movimentName == "rock_left"
+            || movimentName == "rock_right"
     }
 
     static getAllowedMoviments(type, distance){
@@ -257,7 +274,8 @@ class ChessPieceMoviment{
         let moviments = this.CHESS_PIECE_MOVIMENTS[type]
         for(let k in moviments){
             let moviment = moviments[k]
-            if((moviment["x"] == distance["x"] && moviment["y"] == distance["y"])
+            if(moviment["custom"] === true
+                || (moviment["x"] == distance["x"] && moviment["y"] == distance["y"])
                 || (moviment["x"] == 10 && distance["x"] > 0 && moviment["y"] == distance["y"])
                 || (moviment["x"] == -10 && distance["x"] < 0 && moviment["y"] == distance["y"])
                 || (moviment["y"] == 10 && distance["y"] > 0 && moviment["x"] == distance["x"])

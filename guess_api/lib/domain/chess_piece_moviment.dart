@@ -10,6 +10,8 @@ enum ChessPieceMoviment{
   kingLeftTop("king_5", -1, 1),
   kingLeftDown("king_6", -1, -1),
   kingDown("king_7", 0, -1),
+  rockLeft("king_8", 0, 0),
+  rockRight("king_9", 0, 0),
   queenTop("queen_0", 0, 10),
   queenRight("queen_1", 10, 0),
   queenRightTop("queen_2", 10, 10),
@@ -45,12 +47,17 @@ enum ChessPieceMoviment{
 
   final int x, y;
   final String id;
+  
   bool get isXIlimited => x == 10 || x == -10;
   bool get isYIlimited => y == 10 || y == -10;
   int get ilimitedSignX => x == 10 ? 1 : -1;
   int get ilimitedSignY => y == 10 ? 1 : -1;
 
   const ChessPieceMoviment(this.id, this.x, this.y);
+
+  bool get isCustom =>
+    this == rockRight
+    || this == rockLeft;
 
   bool canJump(){
     switch(this){
@@ -76,7 +83,10 @@ enum ChessPieceMoviment{
   }
 
   bool onlyToMove(){
-    return this == pawnTop || this == pawnDown;
+    return this == pawnTop
+      || this == pawnDown
+      || this == rockRight
+      || this == rockLeft;
   }
 
   bool onlyIfPlayer1(){
@@ -86,16 +96,18 @@ enum ChessPieceMoviment{
       || this == pawnDoubleTop;
   }
 
-  bool onlyIfNotMoved(){
-    return this == pawnDoubleTop
-      || this == pawnDoubleDown;
-  }
-
   bool onlyIfPlayer2(){
     return this == pawnDown
       || this == pawnAttackLeftDown
       || this == pawnAttackRightDown
       || this == pawnDoubleDown;
+  }
+
+  bool onlyIfNotMoved(){
+    return this == pawnDoubleTop
+      || this == pawnDoubleDown
+      || this == rockRight
+      || this == rockLeft;
   }
 
   static ChessPieceMoviment fromData(ChessPieceType chessPieceType, int moviment){

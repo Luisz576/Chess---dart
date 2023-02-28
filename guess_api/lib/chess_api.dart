@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:guess_api/models/chess_game.dart';
 import 'package:guess_api/services/socket_handler.dart';
 
-class GuessApi{
+class ChessApi{
   final String address;
   final int port;
   late final ChessGame _chessGame;
@@ -11,7 +11,7 @@ class GuessApi{
   late final HttpServer _server;
   late final SocketHandler _socketHandler;
 
-  GuessApi._(this.address, this.port){
+  ChessApi._(this.address, this.port){
     _chessGame = ChessGame();
     _socketHandler = new SocketHandler(_chessGame);
   }
@@ -27,5 +27,5 @@ class GuessApi{
 }
 
 runServer(String address, int port){
-  GuessApi._(address, port).run();
+  ChessApi._(address, port).run();
 }
