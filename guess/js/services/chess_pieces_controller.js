@@ -25,6 +25,7 @@ class ChessPiecesController{
     updatePiecePosition(piece_id, position){
         if(this.#pieces[piece_id]){
             this.#pieces[piece_id]["piece_position"] = position
+            this.#pieces[piece_id]["piece_moved"] = true
         }
     }
 
@@ -35,12 +36,13 @@ class ChessPiecesController{
         }
     }
 
-    createPiece(piece_id, piece_type, piece_position, owner){
+    createPiece(piece_id, piece_type, piece_position, piece_moved, owner){
         let type = CHESS_PIECE_TYPES.fromValue(piece_type)
         this.#pieces[piece_id] = {
             "piece_id": piece_id,
             "piece_type": type,
             "piece_image": CHESS_PIECE_TYPES.getImage(type, owner),
+            "piece_moved": piece_moved,
             "piece_position": {
                 "x": piece_position[0],
                 "y": piece_position[1]

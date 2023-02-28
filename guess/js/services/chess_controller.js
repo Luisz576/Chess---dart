@@ -2,6 +2,7 @@ class ChessController{
     #tableResolution
     #chessCanvas
     #cgm
+    #chessWhosTime
     #chessModal
     #chessModalMessage
     #chessModalSelectPiece
@@ -21,9 +22,10 @@ class ChessController{
         return this.#isPlayer
     }
 
-    constructor(canvas, cgm, chessModal, chessModalMessage, chessModalSelectPiece, api, tableResolution){
+    constructor(canvas, cgm, chessWhosTime, chessModal, chessModalMessage, chessModalSelectPiece, api, tableResolution){
         this.#chessCanvas = canvas
         this.#cgm = cgm
+        this.#chessWhosTime = chessWhosTime
         this.#chessModal = chessModal
         this.#chessModalMessage = chessModalMessage
         this.#chessModalSelectPiece = chessModalSelectPiece
@@ -156,11 +158,15 @@ class ChessController{
     }
 
     //TODO: rock
-    //TODO: peão andar 2 no começo
 
     #canDoThisMoviment(selectedPiece, moviment, distance = -1){
         if(!ChessPieceMoviment.thisPlayerCanDo(moviment["name"], this.#player)){
             return false;
+        }
+        if(ChessPieceMoviment.onlyIfNotMoved(moviment["name"])){
+            if(selectedPiece["piece_moved"]){
+                return false;
+            }
         }
         let startX = selectedPiece["piece_position"]["x"];
         let startY = selectedPiece["piece_position"]["y"];
@@ -265,8 +271,8 @@ class ChessController{
         }
         this.#cgm.innerText = "Espectador"
     }
-    #onPieceCreate(piece_id, piece_type, piece_position, owner){
-        this.#piecesController.createPiece(piece_id, piece_type, piece_position, owner)
+    #onPieceCreate(piece_id, piece_type, piece_position, piece_moved, owner){
+        this.#piecesController.createPiece(piece_id, piece_type, piece_position, piece_moved, owner)
     }
     #onUpdateChessPiecePosition(chessPieceId, position){
         this.#piecesController.updatePiecePosition(chessPieceId, position)
@@ -283,6 +289,7 @@ class ChessController{
     }
     #onChangePlayerTime(playerTime){
         this.#whoisNow = playerTime
+        this.#chessWhosTime.innerText = `Vez de ${playerTime}`
     }
     #onPlayerWin(player){
         this.#chessModal.classList.add('modal-visible')

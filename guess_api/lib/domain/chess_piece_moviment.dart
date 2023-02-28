@@ -36,6 +36,8 @@ enum ChessPieceMoviment{
   pawnAttackLeftTop("pawn_3", -1, 1),
   pawnAttackRightDown("pawn_4", 1, -1),
   pawnAttackLeftDown("pawn_5", -1, -1),
+  pawnDoubleTop("pawn_6", 0, 2),
+  pawnDoubleDown("pawn_7", 0, -2),
   bishopTopLeft("bishop_0", -10, 10),
   bishopTopRight("bishop_1", 10, 10),
   bishopDownLeft("bishop_2", -10, -10),
@@ -80,13 +82,20 @@ enum ChessPieceMoviment{
   bool onlyIfPlayer1(){
     return this == pawnTop
       || this == pawnAttackLeftTop
-      || this == pawnAttackRightTop;
+      || this == pawnAttackRightTop
+      || this == pawnDoubleTop;
+  }
+
+  bool onlyIfNotMoved(){
+    return this == pawnDoubleTop
+      || this == pawnDoubleDown;
   }
 
   bool onlyIfPlayer2(){
     return this == pawnDown
       || this == pawnAttackLeftDown
-      || this == pawnAttackRightDown;
+      || this == pawnAttackRightDown
+      || this == pawnDoubleDown;
   }
 
   static ChessPieceMoviment fromData(ChessPieceType chessPieceType, int moviment){

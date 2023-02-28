@@ -56,7 +56,7 @@ class ChessGame{
 
   ChessPacket _createChessPiece(ChessPieceType type, int x, int y, int owner){
     final chessPiece = ChessPiece(type, owner, _pieces.length);
-    chessPiece.updatePosition(x, y);
+    chessPiece.updatePosition(x, y, isSetup: true);
     _pieces.add(chessPiece);
     return ChessPacket.chessPieceCreate(chessPiece);
   }
@@ -139,6 +139,12 @@ class ChessGame{
 
       if((pieceMoviment.onlyIfPlayer1() && player == 2) || (pieceMoviment.onlyIfPlayer2() && player == 1)){
         return null;
+      }
+
+      if(pieceMoviment.onlyIfNotMoved()){
+        if(piece.moved){
+          return null;
+        }
       }
 
       int movimentX = 0, movimentY = 0;

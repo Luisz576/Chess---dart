@@ -53,10 +53,11 @@ class ChessApi{
                     const piece_id = data["piece_id"]
                     const piece_type = data["piece_type"]
                     const piece_position = data["piece_position"]
+                    const piece_moved = data["piece_moved"]
                     const piece_owner = data["piece_owner"]
                     if(Number.isInteger(piece_id) && piece_type && piece_position){
                         this.#listeners.chessPieceCreate.forEach((listener) => {
-                            listener(piece_id, piece_type, piece_position, piece_owner)
+                            listener(piece_id, piece_type, piece_position, piece_moved, piece_owner)
                         })
                     }
                     break;

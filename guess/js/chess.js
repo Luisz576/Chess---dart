@@ -2,18 +2,22 @@ class ChessGame{
     #chessCanvas
     #api
     #cgm
+    #chessWhosTime
     #chessModal
     #chessModalMessage
     #chessModalSelectPiece
     #running = false
     #chessController
 
-    constructor(chessCanvas, cgm, chessModal, chessModalMessage, chessModalSelectPiece){
+    constructor(chessCanvas, cgm, chessWhosTime, chessModal, chessModalMessage, chessModalSelectPiece){
         if(!chessCanvas){
             throw "Error to load canvas"
         }
         if(!cgm){
             throw "Error to load cgm"
+        }
+        if(!chessWhosTime){
+            throw "Error to load who's time"
         }
         if(!chessModal){
             throw "Error to load chess modal"
@@ -26,6 +30,7 @@ class ChessGame{
         }
         this.#chessCanvas = chessCanvas
         this.#cgm = cgm
+        this.#chessWhosTime = chessWhosTime
         this.#chessModal = chessModal
         this.#chessModalMessage = chessModalMessage
         this.#chessModalSelectPiece = chessModalSelectPiece
@@ -64,7 +69,7 @@ class ChessGame{
 			throw "This game is already running!"
         this.#running = true
         this.#api = new ChessApi('ws://127.0.0.1:5760/ws', this.#onOpen.bind(this), this.#onClose.bind(this), this.#onReceivePacket.bind(this))
-        this.#chessController = new ChessController(this.#chessCanvas, this.#cgm, this.#chessModal, this.#chessModalMessage, this.#chessModalSelectPiece, this.#api, tableResolution)
+        this.#chessController = new ChessController(this.#chessCanvas, this.#cgm, this.#chessWhosTime, this.#chessModal, this.#chessModalMessage, this.#chessModalSelectPiece, this.#api, tableResolution)
     }
 }
 
@@ -74,7 +79,8 @@ function initChess(){
     const chessModal = document.getElementById('chess-modal')
     const chessModalMessage = document.getElementById('chess-modal-message')
     const chessModalSelectPiece = document.getElementById('chess-modal-select-piece')
-    const game = new ChessGame(canvas, cgm, chessModal, chessModalMessage, chessModalSelectPiece)
+    const chessWhosTime = document.getElementById('chess-game-player-time')
+    const game = new ChessGame(canvas, cgm, chessWhosTime, chessModal, chessModalMessage, chessModalSelectPiece)
     game.startup(60)
 }
 

@@ -179,6 +179,16 @@ class ChessPieceMoviment{
                 "y": -1,
                 "id": 5
             },
+            "pawn_double_top": {
+                "x": 0,
+                "y": 2,
+                "id": 6
+            },
+            "pawn_double_down": {
+                "x": 0,
+                "y": -2,
+                "id": 7
+            }
         },
         "bishop": {
             "top_left": {
@@ -208,13 +218,15 @@ class ChessPieceMoviment{
         if(player == 1){
             if(movimentName == "pawn_down"
                 || movimentName == "pawn_attack_right_down"
-                || movimentName == "pawn_attack_left_down"){
+                || movimentName == "pawn_attack_left_down"
+                || movimentName == "pawn_double_down"){
                 return false;
             }
         }else{
             if(movimentName == "pawn_top"
                 || movimentName == "pawn_attack_right_top"
-                || movimentName == "pawn_attack_left_top"){
+                || movimentName == "pawn_attack_left_top"
+                || movimentName == "pawn_double_top"){
                 return false;
             }
         }
@@ -224,6 +236,8 @@ class ChessPieceMoviment{
     static onlyToMove(movimentName){
         return movimentName == "pawn_top"
             || movimentName == "pawn_down"
+            || movimentName == "pawn_double_top"
+            || movimentName == "pawn_double_down"
     }
 
     static onlyToAttack(movimentName){
@@ -231,6 +245,11 @@ class ChessPieceMoviment{
             || movimentName == "pawn_attack_left_top"
             || movimentName == "pawn_attack_right_down"
             || movimentName == "pawn_attack_left_down"
+    }
+
+    static onlyIfNotMoved(movimentName){
+        return movimentName == "pawn_double_top"
+            || movimentName == "pawn_double_down"
     }
 
     static getAllowedMoviments(type, distance){

@@ -5,13 +5,15 @@ class ChessPiece{
   late ChessPieceType _chessPieceType;
   final int owner, id;
   int _x = 0, _y = 0;
-  bool _destroyed = false;
+  bool _destroyed = false, _moved = false;
 
   ChessPieceType get chessPieceType => _chessPieceType;
 
   int get x => _x;
   int get y => _y;
   List<int> get xy => [_x, _y];
+
+  bool get moved => _moved;
 
   bool get destroyed => _destroyed;
   destroy(){
@@ -32,9 +34,13 @@ class ChessPiece{
     _chessPieceType = type;
   }
 
-  updatePosition(int x, int y){
+  updatePosition(int x, int y, {bool isSetup = false}){
     _x = x;
     _y = y;
+    if(isSetup){
+      return;
+    }
+    _moved = true;
   }
 
   ChessPieceMoviment getMoviment(int moviment){
