@@ -226,11 +226,29 @@ class ChessGame{
   }
 
   bool _hasPieceInWay(int startX, int startY, int endX, int endY){
-    int toX = startX < endX ? startX : endX,
-      toY = startY < endY ? startY : endY;
-    for(int y = startY > endY ? endY : startY; y < toY; y++){
-      for(int x = startX > endX ? endX : startX; x < toX; x++){
-        if(_getPieceAt(x, y) != null){
+    int toX = startX > endX ? startX : endX,
+      fromX = startX > endX ? endX : startX,
+      toY = startY > endY ? startY : endY,
+      fromY = startY > endY ? endY : startY;
+    if(fromY == toY){
+      for(int x = fromX + 1; x < toX; x++){
+        if(_getPieceAt(x, toY) != null){
+          return true;
+        }
+      }
+      return false;
+    }
+    if(fromX == toX){
+      for(int y = fromY + 1; y < toY; y++){
+        if(_getPieceAt(toX, y) != null){
+          return true;
+        }
+      }
+      return false;
+    }
+    if(toX - fromX == toY - fromY){
+      for(int xy = 1; xy < toX - fromX; xy++){
+        if(_getPieceAt(fromX + xy, fromY + xy) != null){
           return true;
         }
       }

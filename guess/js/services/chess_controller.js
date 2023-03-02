@@ -65,10 +65,12 @@ class ChessController{
         let cliquedPiece = this.#piecesController.getPieceAt(clickPosition["x"], clickPosition["y"]);
         if(cliquedPiece){
             if(cliquedPiece["owner"] == this.#player){
-                this.#selectedPiece = cliquedPiece
-                this.#markPossibleMoviments(this.#selectedPiece, ChessPieceMoviment.CHESS_PIECE_MOVIMENTS[this.#selectedPiece["piece_type"]])
-                this.renderTable()
-                return;
+                if(!this.#isPossibleMoviment(cliquedPiece["piece_position"])){
+                    this.#selectedPiece = cliquedPiece
+                    this.#markPossibleMoviments(this.#selectedPiece, ChessPieceMoviment.CHESS_PIECE_MOVIMENTS[this.#selectedPiece["piece_type"]])
+                    this.renderTable()
+                    return;
+                }
             }
         }
         if(this.#selectedPiece){
@@ -94,6 +96,7 @@ class ChessController{
                     this.#sendMovimentPacket(this.#selectedPiece["piece_id"], moviment["id"],
                         Math.min(maxDist, dist)
                     )
+                    this.#selectedPiece = undefined
                     this.#clearPossibleMoviments()
                     this.renderTable()
                     break;
@@ -108,6 +111,17 @@ class ChessController{
     }
 
     #possibleMoviments = []
+
+    #isPossibleMoviment(position){
+        for(let i in this.#possibleMoviments){
+            let pm = this.#possibleMoviments[i]
+            if(pm["newPosition"]["x"] == position["x"]
+                && pm["newPosition"]["y"] == position["y"]){
+                return true
+            }
+        }
+        return false
+    }
 
     #markPossibleMoviments(selectedPiece, moviments){
         this.#clearPossibleMoviments()
@@ -158,18 +172,50 @@ class ChessController{
         return power;
     }
 
+    #hasPieceInWay(startX, startY, endX, endY){
+        let toX = startX > endX ? startX : endX,
+            fromX = startX > endX ? endX : startX,
+            toY = startY > endY ? startY : endY,
+            fromY = startY > endY ? endY : startY;
+        if(fromY == toY){
+            for(let x = fromX + 1; x < toX; x++){
+                if(this.#piecesController.getPieceAt(x, toY) != null){
+                    return true;
+                }
+            }
+            return false;
+        }
+        if(fromX == toX){
+            for(let y = fromY + 1; y < toY; y++){
+                if(this.#piecesController.getPieceAt(toX, y) != null){
+                    return true;
+                }
+            }
+            return false;
+        }
+        if(toX - fromX == toY - fromY){
+            for(let xy = 1; xy < toX - fromX; xy++){
+                if(this.#piecesController.getPieceAt(fromX + xy, fromY + xy) != null){
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     #canDoThisMoviment(selectedPiece, moviment, distance = -1){
         if(!ChessPieceMoviment.thisPlayerCanDo(moviment["name"], this.#player)){
             return false;
         }
+
         if(ChessPieceMoviment.onlyIfNotMoved(moviment["name"])){
             if(selectedPiece["piece_moved"]){
                 return false;
             }
         }
 
-        if(moviment["custom"] === true){
-            return ChessPieceCustomMoviment.canDoThisMoviment(this.#player, selectedPiece, moviment, this.#piecesController.getPieceAt.bind(this.#piecesController))
+        if(moviment["custom"] == true){
+            return ChessPieceCustomMoviment.canDoThisMoviment(this.#player, selectedPiece, moviment, this.#piecesController.getPieceAt.bind(this.#piecesController), this.#hasPieceInWay.bind(this))
         }
 
         let startX = selectedPiece["piece_position"]["x"];
@@ -177,19 +223,24 @@ class ChessController{
         if(distance == -1){
             let endX = startX + moviment["x"]
             let endY = startY + moviment["y"]
+
+            if(this.#hasPieceInWay(startX, startY, endX, endY) && !ChessPieceMoviment.canJump(moviment["name"])){
+                return false
+            }
+
             if(moviment["x"] != 10 && moviment["x"] != -10
                 && moviment["y"] != 10 && moviment["y"] != -10){
                 let target = this.#piecesController.getPieceAt(endX, endY)
                 if(target != null){
                     if(ChessPieceMoviment.onlyToMove(moviment["name"])){
-                        return false;
+                        return false
                     }
                     return target["owner"] != this.#player
-                    }
+                }
                 if(ChessPieceMoviment.onlyToAttack(moviment["name"])){
                     return false;
                 }
-                return true;
+                return true
             }
 
             let maxDist = this.#whatsMaxDistance(selectedPiece["piece_position"],
@@ -208,6 +259,10 @@ class ChessController{
 
         if(endX > 7 || endX < 0 || endY > 7 || endY < 0){
             return false;
+        }
+
+        if(this.#hasPieceInWay(startX, startY, endX, endY) && !ChessPieceMoviment.canJump(moviment["name"])){
+            return false
         }
 
         if(moviment["x"] != 10 && moviment["x"] != -10
@@ -243,6 +298,23 @@ class ChessController{
     }
 
     #addPossibleMoviment(currentPosition, moviment, power = 1){
+        if(moviment["custom"] == true){
+            let movimentation = ChessPieceCustomMoviment.getCustomMovimentationMark(this.#player, currentPosition, moviment["name"])
+            this.#possibleMoviments.push({
+                "id": moviment["id"],
+                "current_position": currentPosition,
+                "base_moviment": {
+                    "x": movimentation["x"],
+                    "y": movimentation["y"]
+                },
+                "newPosition": {
+                    "x": currentPosition["x"] + movimentation["x"],
+                    "y": currentPosition["y"] + movimentation["y"]
+                },
+                "power": power,
+            })
+            return
+        }
         this.#possibleMoviments.push({
             "id": moviment["id"],
             "current_position": currentPosition,

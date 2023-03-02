@@ -66,13 +66,24 @@ body{
     width: 100vw;
     height: 100vh;
     z-index: 100;
+    justify-content: center;
+    align-content: center;
 }
 .modal-visible{
     display: grid;
-    justify-content: center;
-    align-content: center;
 }
 .modal-box{
     background-color: #fdfdfd;
     padding: 20px 40px;
+}
+.chess-type-options{
+    list-style: none;
+    padding: 0;
+}
+.chess-type-option + .chess-type-option{
+    margin-top: 5px;
+}
+.chess-type-option:hover{
+    cursor: pointer;
+    text-decoration: underline;
 }

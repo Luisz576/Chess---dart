@@ -222,6 +222,17 @@ class ChessPieceMoviment{
         }
     }
 
+    static canJump(movimentName){
+        return movimentName == "top_top_left"
+            || movimentName == "top_top_right"
+            || movimentName == "top_left_left"
+            || movimentName == "top_right_right"
+            || movimentName == "down_down_left"
+            || movimentName == "down_down_right"
+            || movimentName == "down_left_left"
+            || movimentName == "down_right_right"
+    }
+
     static thisPlayerCanDo(movimentName, player){
         if(player == 1){
             if(movimentName == "pawn_down"
@@ -270,7 +281,7 @@ class ChessPieceMoviment{
     }
 
     static getAllowedMoviments(type, distance){
-        let ms = []
+        let ms = {}
         let moviments = this.CHESS_PIECE_MOVIMENTS[type]
         for(let k in moviments){
             let moviment = moviments[k]
@@ -284,7 +295,7 @@ class ChessPieceMoviment{
                 || (moviment["x"] == 10 && distance["x"] > 0 && moviment["y"] == -10 && distance["y"] < 0)
                 || (moviment["x"] == -10 && distance["x"] < 0 && moviment["y"] == 10 && distance["y"] > 0)
                 || (moviment["x"] == -10 && distance["x"] < 0 && moviment["y"] == -10 && distance["y"] < 0)){
-                ms.push(moviment)
+                ms[k] = moviment
             }
         }
         return ms
